@@ -166,7 +166,7 @@ export const smsService = {
     try {
       const apiKey = await this.decrypt(settings.api_key_encrypted);
 
-      const response = await fetch('https://tweetsms.ps/api.php/maan/balance', {
+      const response = await fetch('https://tweetsms.ps/api.php/maan/chk_balance', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -258,9 +258,9 @@ export const smsService = {
         },
         body: new URLSearchParams({
           api_key: apiKey,
-          name: sender,
-          mobile: formattedPhone,
+          to: formattedPhone,
           message: message,
+          sender: sender,
         }),
       });
 
