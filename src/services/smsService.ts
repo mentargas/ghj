@@ -2,7 +2,7 @@ import { supabase } from '../lib/supabaseClient';
 
 export interface SMSSettings {
   id: string;
-  api_key_encrypted: string;
+  api_key: string;
   sender_name: string;
   api_url: string;
   max_daily_limit: number;
@@ -109,10 +109,7 @@ export const smsService = {
 
     if (!data) return null;
 
-    return {
-      ...data,
-      api_key_encrypted: data.api_key
-    } as SMSSettings;
+    return data as SMSSettings;
   },
 
   async saveSettings(settings: Partial<SMSSettings>): Promise<SMSSettings> {
@@ -120,7 +117,7 @@ export const smsService = {
 
     try {
       const { data, error } = await supabase.rpc('upsert_sms_settings', {
-        p_api_key_encrypted: settings.api_key_encrypted || '',
+        p_api_key_encrypted: settings.api_key || '',
         p_sender_name: settings.sender_name || '',
         p_api_url: settings.api_url || 'https://tweetsms.ps/api.php/maan',
         p_max_daily_limit: settings.max_daily_limit || 1000,
@@ -141,11 +138,7 @@ export const smsService = {
         throw new Error(`Failed to save settings: ${errorMsg}`);
       }
 
-      const resultData = data.data;
-      return {
-        ...resultData,
-        api_key_encrypted: resultData.api_key
-      } as SMSSettings;
+      return data.data as SMSSettings;
     } catch (error) {
       console.error('Exception in saveSettings:', error);
       throw error instanceof Error ? error : new Error('Failed to save settings');
@@ -164,7 +157,7 @@ export const smsService = {
     }
 
     try {
-      const apiKey = await this.decrypt(settings.api_key_encrypted);
+      const apiKey = await this.decrypt(settings.api_key);
 
       const response = await fetch('https://tweetsms.ps/api.php/maan/chk_balance', {
         method: 'POST',
@@ -248,7 +241,7 @@ export const smsService = {
     }
 
     try {
-      const apiKey = await this.decrypt(settings.api_key_encrypted);
+      const apiKey = await this.decrypt(settings.api_key);
       const sender = settings.sender_name;
 
       const response = await fetch('https://tweetsms.ps/api.php/maan/sendsms', {

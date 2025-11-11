@@ -8,7 +8,7 @@ export default function SMSSettingsPage() {
   const { logInfo, logError } = useErrorLogger();
   const [activeTab, setActiveTab] = useState<'settings' | 'test' | 'logs' | 'statistics'>('settings');
   const [settings, setSettings] = useState<Partial<SMSSettings>>({
-    api_key_encrypted: '',
+    api_key: '',
     sender_name: '',
     api_url: 'https://tweetsms.ps/api.php/maan',
     max_daily_limit: 1000,
@@ -72,17 +72,17 @@ export default function SMSSettingsPage() {
   const handleSaveSettings = async () => {
     setSaving(true);
     try {
-      if (!settings.api_key_encrypted || !settings.sender_name) {
+      if (!settings.api_key || !settings.sender_name) {
         showNotification('يرجى ملء جميع الحقول المطلوبة', 'error');
         setSaving(false);
         return;
       }
 
-      const encryptedApiKey = await smsService.encrypt(settings.api_key_encrypted);
+      const encryptedApiKey = await smsService.encrypt(settings.api_key);
 
       await smsService.saveSettings({
         ...settings,
-        api_key_encrypted: encryptedApiKey,
+        api_key: encryptedApiKey,
       });
 
       showNotification('تم حفظ الإعدادات بنجاح', 'success');
@@ -331,8 +331,8 @@ export default function SMSSettingsPage() {
                   <div className="relative">
                     <Input
                       type={showApiKey ? 'text' : 'password'}
-                      value={settings.api_key_encrypted || ''}
-                      onChange={(e) => setSettings({ ...settings, api_key_encrypted: e.target.value })}
+                      value={settings.api_key || ''}
+                      onChange={(e) => setSettings({ ...settings, api_key: e.target.value })}
                       placeholder="أدخل API Key من حساب TweetSMS"
                       disabled={loading}
                     />
