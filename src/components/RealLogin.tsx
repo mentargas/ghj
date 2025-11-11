@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Shield, Mail, Lock, Eye, EyeOff, AlertTriangle, CheckCircle, LogIn, UserPlus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Shield, Mail, Lock, Eye, EyeOff, AlertTriangle, CheckCircle, LogIn, UserPlus, ShieldCheck } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import type { SystemUser } from '../data/mockData';
 
@@ -19,6 +19,37 @@ export default function RealLogin({ onLogin }: RealLoginProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [canRegister, setCanRegister] = useState<boolean | null>(null);
+  const [checkingRegistration, setCheckingRegistration] = useState(true);
+
+  useEffect(() => {
+    checkIfCanRegister();
+  }, []);
+
+  const checkIfCanRegister = async () => {
+    setCheckingRegistration(true);
+    try {
+      if (!supabase) {
+        setCanRegister(false);
+        return;
+      }
+
+      const { data, error } = await supabase.rpc('check_if_first_admin');
+
+      if (error) {
+        console.error('Error checking registration status:', error);
+        setCanRegister(false);
+        return;
+      }
+
+      setCanRegister(data === true);
+    } catch (error) {
+      console.error('Error checking registration:', error);
+      setCanRegister(false);
+    } finally {
+      setCheckingRegistration(false);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,6 +154,11 @@ export default function RealLogin({ onLogin }: RealLoginProps) {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!canRegister) {
+      setError('لا يمكن إنشاء حسابات جديدة. النظام يحتوي على حساب مدير بالفعل.');
+      return;
+    }
+
     if (!email.trim() || !password.trim() || !name.trim()) {
       setError('يرجى ملء جميع الحقول المطلوبة');
       return;
@@ -161,6 +197,9 @@ export default function RealLogin({ onLogin }: RealLoginProps) {
       if (!authData.user) {
         throw new Error('فشل إنشاء الحساب');
       }
+
+      // تحديث حالة التسجيل بعد إنشاء الحساب
+      setCanRegister(false);
 
       // التحقق إذا كان البريد يحتاج تأكيد
       if (authData.user && !authData.session) {
@@ -214,6 +253,9 @@ export default function RealLogin({ onLogin }: RealLoginProps) {
 
       if (error.message === 'User already registered') {
         errorMessage = 'البريد الإلكتروني مسجل مسبقاً';
+      } else if (error.message.includes('لا يمكن إنشاء حسابات جديدة')) {
+        errorMessage = 'لا يمكن إنشاء حسابات جديدة. النظام يحتوي على حساب مدير بالفعل.';
+        setCanRegister(false);
       } else if (error.message) {
         errorMessage = error.message;
       }
@@ -262,9 +304,41 @@ export default function RealLogin({ onLogin }: RealLoginProps) {
     }
   };
 
+  if (checkingRegistration) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4" dir="rtl">
+        <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <p className="text-gray-600">جاري التحقق من النظام...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4" dir="rtl">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+        {/* Registration Status Banner */}
+        {canRegister && viewMode === 'register' && (
+          <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-4 text-white text-center">
+            <div className="flex items-center justify-center space-x-2 space-x-reverse">
+              <ShieldCheck className="w-5 h-5" />
+              <span className="text-sm font-medium">إنشاء أول حساب مدير - مرة واحدة فقط</span>
+            </div>
+          </div>
+        )}
+
+        {!canRegister && viewMode === 'register' && (
+          <div className="bg-gradient-to-r from-red-600 to-rose-600 p-4 text-white text-center">
+            <div className="flex items-center justify-center space-x-2 space-x-reverse">
+              <AlertTriangle className="w-5 h-5" />
+              <span className="text-sm font-medium">النظام يحتوي على حساب مدير بالفعل</span>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-white text-center">
           <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
@@ -378,26 +452,36 @@ export default function RealLogin({ onLogin }: RealLoginProps) {
                 )}
               </button>
 
-              <div className="text-center pt-4 border-t">
-                <span className="text-gray-600 text-sm">ليس لديك حساب؟ </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setViewMode('register');
-                    setError('');
-                    setSuccess('');
-                  }}
-                  className="text-blue-600 hover:text-blue-700 font-medium text-sm"
-                  disabled={isLoading}
-                >
-                  إنشاء حساب جديد
-                </button>
-              </div>
+              {canRegister && (
+                <div className="text-center pt-4 border-t">
+                  <span className="text-gray-600 text-sm">ليس لديك حساب؟ </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setViewMode('register');
+                      setError('');
+                      setSuccess('');
+                    }}
+                    className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+                    disabled={isLoading}
+                  >
+                    إنشاء حساب جديد
+                  </button>
+                </div>
+              )}
+
+              {!canRegister && (
+                <div className="text-center pt-4 border-t">
+                  <p className="text-gray-500 text-xs">
+                    التسجيل معطل. النظام يحتوي على حساب مدير بالفعل.
+                  </p>
+                </div>
+              )}
             </form>
           )}
 
           {/* Register Form */}
-          {viewMode === 'register' && (
+          {viewMode === 'register' && canRegister && (
             <form onSubmit={handleRegister} className="space-y-5">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -473,6 +557,12 @@ export default function RealLogin({ onLogin }: RealLoginProps) {
                 <p className="text-xs text-gray-500 mt-1">كلمة المرور يجب أن تكون 6 أحرف على الأقل</p>
               </div>
 
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-xs text-blue-800 leading-relaxed">
+                  ملاحظة: هذا هو الحساب الأول والأخير الذي يمكن إنشاؤه عبر هذه الصفحة. بعد إنشاء هذا الحساب، سيتم تعطيل التسجيل تلقائياً.
+                </p>
+              </div>
+
               <button
                 type="submit"
                 disabled={isLoading}
@@ -507,6 +597,29 @@ export default function RealLogin({ onLogin }: RealLoginProps) {
                 </button>
               </div>
             </form>
+          )}
+
+          {/* Registration Disabled Message */}
+          {viewMode === 'register' && !canRegister && (
+            <div className="p-8 space-y-6">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+                <AlertTriangle className="w-12 h-12 text-red-600 mx-auto mb-4" />
+                <h3 className="text-lg font-bold text-red-900 mb-2">التسجيل معطل</h3>
+                <p className="text-red-800 text-sm mb-4">
+                  النظام يحتوي على حساب مدير بالفعل. لا يمكن إنشاء حسابات إضافية عبر هذه الصفحة.
+                </p>
+                <button
+                  onClick={() => {
+                    setViewMode('login');
+                    setError('');
+                    setSuccess('');
+                  }}
+                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                >
+                  العودة لتسجيل الدخول
+                </button>
+              </div>
+            </div>
           )}
 
           {/* Forgot Password Form */}
