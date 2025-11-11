@@ -37,6 +37,9 @@ export const publicSearchService = {
     userAgent?: string
   ): Promise<PublicSearchResult> {
     try {
+      console.log('[PublicSearch] Starting search for:', nationalId);
+      console.log('[PublicSearch] IP:', ipAddress, 'UserAgent:', userAgent?.substring(0, 50));
+
       const { data, error } = await supabase.rpc('public_search_beneficiary', {
         p_national_id: nationalId,
         p_ip_address: ipAddress || null,
@@ -44,7 +47,8 @@ export const publicSearchService = {
       });
 
       if (error) {
-        console.error('Error calling public_search_beneficiary:', error);
+        console.error('[PublicSearch] RPC Error:', error);
+        console.error('[PublicSearch] Error details:', JSON.stringify(error, null, 2));
         return {
           success: false,
           error: 'search_error',
@@ -52,9 +56,21 @@ export const publicSearchService = {
         };
       }
 
+      console.log('[PublicSearch] Search result:', data);
+
+      if (!data) {
+        console.error('[PublicSearch] No data returned from RPC');
+        return {
+          success: false,
+          error: 'no_data',
+          message: 'لم يتم استرجاع أي بيانات'
+        };
+      }
+
       return data as PublicSearchResult;
     } catch (err) {
-      console.error('Unexpected error in searchBeneficiary:', err);
+      console.error('[PublicSearch] Unexpected error:', err);
+      console.error('[PublicSearch] Error stack:', err instanceof Error ? err.stack : 'No stack');
       return {
         success: false,
         error: 'unexpected_error',
