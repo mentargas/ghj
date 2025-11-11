@@ -106,7 +106,13 @@ export const smsService = {
       .maybeSingle();
 
     if (error) throw error;
-    return data as SMSSettings | null;
+
+    if (!data) return null;
+
+    return {
+      ...data,
+      api_key_encrypted: data.api_key
+    } as SMSSettings;
   },
 
   async saveSettings(settings: Partial<SMSSettings>): Promise<SMSSettings> {
@@ -135,7 +141,11 @@ export const smsService = {
         throw new Error(`Failed to save settings: ${errorMsg}`);
       }
 
-      return data.data as SMSSettings;
+      const resultData = data.data;
+      return {
+        ...resultData,
+        api_key_encrypted: resultData.api_key
+      } as SMSSettings;
     } catch (error) {
       console.error('Exception in saveSettings:', error);
       throw error instanceof Error ? error : new Error('Failed to save settings');
