@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { Shield, Search, Package, CheckCircle, Clock, AlertCircle, MessageCircle, Phone, HelpCircle, Users, Building2, Heart, Info, ChevronDown, Lightbulb, UserPlus, User, FileText } from 'lucide-react';
-import { searchBeneficiaryByNationalId } from '../services/beneficiarySearchService';
+import { publicSearchService } from '../services/publicSearchService';
 import { Button, Input, Card, SearchLoadingSkeleton } from './ui';
 import Tabs from './ui/Tabs';
 import OverviewTab from './beneficiary-search/OverviewTab';
 import BeneficiaryDataTab from './beneficiary-search/BeneficiaryDataTab';
 import PackagesTab from './beneficiary-search/PackagesTab';
 import RegistrationWizard from './RegistrationWizard';
+import PublicSearchResult from './PublicSearchResult';
+import PINCreationModal from './modals/PINCreationModal';
+import PINVerificationModal from './modals/PINVerificationModal';
 import type { Database } from '../types/database';
 
 type Beneficiary = Database['public']['Tables']['beneficiaries']['Row'];
@@ -17,24 +20,49 @@ interface LandingPageProps {
 }
 
 interface SearchResult {
-  beneficiary: Beneficiary | null;
-  packages: PackageType[];
-  totalPackages: number;
-  deliveredPackages: number;
-  pendingPackages: number;
-  inDeliveryPackages: number;
+  success: boolean;
+  beneficiary?: {
+    id: string;
+    name: string;
+    national_id: string;
+    status: string;
+  };
+  in_delivery_package?: Array<{
+    id: string;
+    name: string;
+    status: string;
+    tracking_number: string | null;
+    scheduled_delivery_date: string | null;
+    created_at: string;
+  }>;
+  has_pin?: boolean;
   error?: string;
+  message?: string;
+}
+
+interface FullBeneficiary extends Beneficiary {
+  packages: PackageType[];
+  stats: {
+    total: number;
+    delivered: number;
+    pending: number;
+    in_delivery: number;
+  };
 }
 
 export default function LandingPage({ onNavigateTo }: LandingPageProps) {
   const [nationalId, setNationalId] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
+  const [fullDetails, setFullDetails] = useState<FullBeneficiary | null>(null);
+  const [showFullDetails, setShowFullDetails] = useState(false);
   const [error, setError] = useState('');
   const [showAdminMenu, setShowAdminMenu] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showExampleImage, setShowExampleImage] = useState(false);
   const [showRegistrationWizard, setShowRegistrationWizard] = useState(false);
+  const [showPINCreation, setShowPINCreation] = useState(false);
+  const [showPINVerification, setShowPINVerification] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
 
   const handleSearch = async () => {
@@ -46,16 +74,21 @@ export default function LandingPage({ onNavigateTo }: LandingPageProps) {
     setIsSearching(true);
     setError('');
     setSearchResult(null);
+    setFullDetails(null);
+    setShowFullDetails(false);
 
     try {
-      const result = await searchBeneficiaryByNationalId(nationalId.trim());
+      const result = await publicSearchService.searchBeneficiary(
+        nationalId.trim(),
+        publicSearchService.getClientIP(),
+        publicSearchService.getUserAgent()
+      );
 
-      if (result.error) {
-        setError(result.error);
+      if (!result.success) {
+        setError(result.message || 'حدث خطأ أثناء البحث');
         setSearchResult(null);
       } else {
         setSearchResult(result);
-        setActiveTab('overview');
       }
     } catch (err: any) {
       setError(err.message || 'حدث خطأ أثناء البحث');
@@ -75,8 +108,76 @@ export default function LandingPage({ onNavigateTo }: LandingPageProps) {
   const handleReset = () => {
     setNationalId('');
     setSearchResult(null);
+    setFullDetails(null);
+    setShowFullDetails(false);
     setError('');
     setActiveTab('overview');
+  };
+
+  const handleViewDetails = () => {
+    if (!searchResult?.beneficiary) return;
+
+    if (searchResult.has_pin) {
+      setShowPINVerification(true);
+    } else {
+      setShowPINCreation(true);
+    }
+  };
+
+  const handlePINCreated = async (pin: string) => {
+    if (!searchResult?.beneficiary) return;
+
+    try {
+      const result = await publicSearchService.createPIN(
+        searchResult.beneficiary.id,
+        searchResult.beneficiary.national_id,
+        pin
+      );
+
+      if (result.success) {
+        setShowPINCreation(false);
+        await loadFullDetails(pin);
+      } else {
+        alert(result.message || 'حدث خطأ في إنشاء كلمة المرور');
+      }
+    } catch (err) {
+      alert('حدث خطأ غير متوقع');
+    }
+  };
+
+  const handlePINVerified = async (pin: string) => {
+    await loadFullDetails(pin);
+  };
+
+  const loadFullDetails = async (pin: string) => {
+    if (!searchResult?.beneficiary) return;
+
+    try {
+      const result = await publicSearchService.getFullBeneficiaryDetails(
+        searchResult.beneficiary.id,
+        searchResult.beneficiary.national_id,
+        pin
+      );
+
+      if (result.success && result.beneficiary) {
+        setFullDetails({
+          ...result.beneficiary,
+          packages: result.packages || [],
+          stats: result.stats || {
+            total: 0,
+            delivered: 0,
+            pending: 0,
+            in_delivery: 0
+          }
+        });
+        setShowFullDetails(true);
+        setShowPINVerification(false);
+      } else {
+        alert(result.message || 'حدث خطأ في التحقق من كلمة المرور');
+      }
+    } catch (err) {
+      alert('حدث خطأ غير متوقع');
+    }
   };
 
   const handleWhatsAppSupport = () => {
@@ -348,8 +449,19 @@ export default function LandingPage({ onNavigateTo }: LandingPageProps) {
           <SearchLoadingSkeleton message="جاري البحث عن معلوماتك، يرجى الانتظار..." />
         )}
 
-        {/* Search Results */}
-        {searchResult && !isSearching && searchResult.beneficiary && (
+        {/* Search Results - Limited View */}
+        {searchResult && !isSearching && searchResult.beneficiary && !showFullDetails && (
+          <PublicSearchResult
+            beneficiary={searchResult.beneficiary}
+            inDeliveryPackage={searchResult.in_delivery_package}
+            hasPIN={searchResult.has_pin || false}
+            onViewDetails={handleViewDetails}
+            onCreatePIN={() => setShowPINCreation(true)}
+          />
+        )}
+
+        {/* Full Details View */}
+        {fullDetails && showFullDetails && (
           <div className="space-y-6">
             <Card padding="none">
               <div className="p-6 border-b border-gray-200">
@@ -394,23 +506,18 @@ export default function LandingPage({ onNavigateTo }: LandingPageProps) {
               <div className="p-6">
                 {activeTab === 'overview' && (
                   <OverviewTab
-                    beneficiary={searchResult.beneficiary}
-                    packagesStats={{
-                      total: searchResult.totalPackages,
-                      delivered: searchResult.deliveredPackages,
-                      pending: searchResult.pendingPackages,
-                      inDelivery: searchResult.inDeliveryPackages
-                    }}
+                    beneficiary={fullDetails}
+                    packagesStats={fullDetails.stats}
                   />
                 )}
                 {activeTab === 'data' && (
                   <BeneficiaryDataTab
-                    beneficiary={searchResult.beneficiary}
+                    beneficiary={fullDetails}
                     onUpdate={handleRefresh}
                   />
                 )}
                 {activeTab === 'packages' && (
-                  <PackagesTab packages={searchResult.packages} />
+                  <PackagesTab packages={fullDetails.packages} />
                 )}
               </div>
             </Card>
@@ -418,7 +525,7 @@ export default function LandingPage({ onNavigateTo }: LandingPageProps) {
         )}
 
         {/* Error: Not Found */}
-        {searchResult && !isSearching && !searchResult.beneficiary && (
+        {searchResult && !isSearching && !searchResult.success && (
           <Card className="bg-gradient-to-br from-orange-50 to-yellow-50 border-2 border-orange-200">
             <div className="text-center py-10">
               <div className="w-20 h-20 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-5 shadow-lg">
@@ -428,7 +535,7 @@ export default function LandingPage({ onNavigateTo }: LandingPageProps) {
                 لم نجد معلومات بهذا الرقم
               </h3>
               <p className="text-lg text-gray-700 mb-6 max-w-md mx-auto leading-relaxed">
-                {searchResult.error || 'رقم الهوية الذي أدخلته غير موجود في قاعدة بياناتنا'}
+                {searchResult.message || searchResult.error || 'رقم الهوية الذي أدخلته غير موجود في قاعدة بياناتنا'}
               </p>
 
               <div className="bg-white rounded-xl p-6 mb-6 max-w-md mx-auto border-2 border-orange-300">
@@ -585,6 +692,26 @@ export default function LandingPage({ onNavigateTo }: LandingPageProps) {
             onCancel={() => setShowRegistrationWizard(false)}
           />
         </div>
+      )}
+
+      {searchResult?.beneficiary && (
+        <>
+          <PINCreationModal
+            isOpen={showPINCreation}
+            onClose={() => setShowPINCreation(false)}
+            onSuccess={handlePINCreated}
+            beneficiaryName={searchResult.beneficiary.name}
+            nationalId={searchResult.beneficiary.national_id}
+          />
+
+          <PINVerificationModal
+            isOpen={showPINVerification}
+            onClose={() => setShowPINVerification(false)}
+            onSuccess={handlePINVerified}
+            beneficiaryName={searchResult.beneficiary.name}
+            nationalId={searchResult.beneficiary.national_id}
+          />
+        </>
       )}
     </div>
   );
