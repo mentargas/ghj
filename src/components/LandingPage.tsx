@@ -252,16 +252,6 @@ export default function LandingPage({ onNavigateTo }: LandingPageProps) {
                       <p className="text-xs text-gray-600">إدارة العائلات</p>
                     </div>
                   </button>
-                  <button
-                    onClick={() => onNavigateTo('tweetsms')}
-                    className="w-full px-4 py-3 text-right hover:bg-orange-50 flex items-center gap-3 transition-colors"
-                  >
-                    <MessageCircle className="w-4 h-4 text-orange-600" />
-                    <div>
-                      <p className="font-medium text-gray-900">اختبار TweetSMS</p>
-                      <p className="text-xs text-gray-600">إرسال الرسائل القصيرة</p>
-                    </div>
-                  </button>
                   <div className="border-t border-gray-200 mt-2 pt-2">
                     <button
                       onClick={() => onNavigateTo('beneficiary')}
