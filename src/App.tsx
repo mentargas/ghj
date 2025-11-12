@@ -14,9 +14,10 @@ const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 const OrganizationsDashboard = lazy(() => import('./components/OrganizationsDashboard'));
 const FamiliesDashboard = lazy(() => import('./components/FamiliesDashboard'));
 const BeneficiaryPortal = lazy(() => import('./components/BeneficiaryPortal'));
+const TweetSmsTestPage = lazy(() => import('./components/pages/TweetSmsTestPage'));
 const ErrorConsole = lazy(() => import('./components/ErrorConsole').then(module => ({ default: module.ErrorConsole })));
 
-type PageType = 'landing' | 'admin' | 'organizations' | 'families' | 'beneficiary';
+type PageType = 'landing' | 'admin' | 'organizations' | 'families' | 'beneficiary' | 'tweetsms';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('landing');
@@ -153,6 +154,11 @@ function AppContent({
         {currentPage === 'beneficiary' && (
           <ErrorBoundary componentName="BeneficiaryPortal">
             <BeneficiaryPortal onBack={handleNavigateBack} />
+          </ErrorBoundary>
+        )}
+        {currentPage === 'tweetsms' && (
+          <ErrorBoundary componentName="TweetSmsTestPage">
+            <TweetSmsTestPage />
           </ErrorBoundary>
         )}
       </Suspense>
