@@ -28,16 +28,16 @@ export default function Card({
   };
 
   const variantClasses = {
-    default: 'bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shadow-soft',
-    glass: 'glass-card',
-    elevated: 'bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 shadow-elevated',
-    gradient: 'bg-gradient-to-br from-white to-neutral-50 dark:from-neutral-800 dark:to-neutral-900 border border-neutral-200 dark:border-neutral-700 shadow-soft',
-    bordered: 'bg-white dark:bg-neutral-800 border-2 border-neutral-300 dark:border-neutral-600'
+    default: 'bg-white dark:bg-neutral-800 border border-secondary-100 dark:border-neutral-700 shadow-card hover:shadow-card-hover',
+    glass: 'glass-card backdrop-blur-lg',
+    elevated: 'bg-white dark:bg-neutral-800 border border-secondary-50 dark:border-neutral-700 shadow-elevated hover:shadow-elevated-lg',
+    gradient: 'bg-gradient-to-br from-white via-secondary-50/30 to-secondary-100/50 dark:from-neutral-800 dark:to-neutral-900 border border-secondary-100 dark:border-neutral-700 shadow-card',
+    bordered: 'bg-white dark:bg-neutral-800 border-2 border-primary-200 dark:border-neutral-600 hover:border-primary-300'
   };
 
   const hoverClasses = hover ? 'card-hover' : '';
   const clickableClasses = onClick ? 'cursor-pointer' : '';
-  const glowClasses = glow ? 'shadow-glow-trust dark:shadow-glow-accent' : '';
+  const glowClasses = glow ? 'shadow-glow-primary dark:shadow-glow-secondary' : '';
 
   const classes = `${variantClasses[variant]} ${paddingClasses[padding]} ${hoverClasses} ${clickableClasses} ${glowClasses} rounded-2xl transition-all duration-300 ${className}`;
 

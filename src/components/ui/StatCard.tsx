@@ -10,7 +10,7 @@ interface StatCardProps {
     direction: 'up' | 'down';
     label: string;
   };
-  color?: 'trust' | 'accent' | 'success' | 'warning' | 'error' | 'info';
+  color?: 'primary' | 'secondary' | 'accent' | 'success' | 'warning' | 'error' | 'info';
   className?: string;
   loading?: boolean;
 }
@@ -20,20 +20,27 @@ const StatCard = React.memo(function StatCard({
   value,
   icon: Icon,
   trend,
-  color = 'trust',
+  color = 'primary',
   className = '',
   loading = false
 }: StatCardProps) {
   const colorClasses = {
-    trust: {
-      icon: 'bg-gradient-to-br from-trust-500 to-trust-600 text-white shadow-lg shadow-trust-500/30',
-      iconRing: 'ring-trust-100 dark:ring-trust-900/50',
-      border: 'border-trust-100 dark:border-trust-900/50',
-      glow: 'group-hover:shadow-trust-500/40',
-      accent: 'text-trust-600 dark:text-trust-400'
+    primary: {
+      icon: 'bg-gradient-to-br from-primary-600 to-primary-800 text-white shadow-lg shadow-primary-600/30',
+      iconRing: 'ring-primary-100 dark:ring-primary-900/50',
+      border: 'border-primary-100 dark:border-primary-900/50',
+      glow: 'group-hover:shadow-primary-600/40',
+      accent: 'text-primary-600 dark:text-primary-400'
+    },
+    secondary: {
+      icon: 'bg-gradient-to-br from-secondary-500 to-secondary-700 text-white shadow-lg shadow-secondary-500/30',
+      iconRing: 'ring-secondary-100 dark:ring-secondary-900/50',
+      border: 'border-secondary-100 dark:border-secondary-900/50',
+      glow: 'group-hover:shadow-secondary-500/40',
+      accent: 'text-secondary-600 dark:text-secondary-400'
     },
     accent: {
-      icon: 'bg-gradient-to-br from-accent-500 to-accent-600 text-white shadow-lg shadow-accent-500/30',
+      icon: 'bg-gradient-to-br from-accent-400 to-accent-600 text-primary-900 shadow-lg shadow-accent-500/30',
       iconRing: 'ring-accent-100 dark:ring-accent-900/50',
       border: 'border-accent-100 dark:border-accent-900/50',
       glow: 'group-hover:shadow-accent-500/40',
@@ -61,11 +68,11 @@ const StatCard = React.memo(function StatCard({
       accent: 'text-error-600 dark:text-error-400'
     },
     info: {
-      icon: 'bg-gradient-to-br from-trust-500 to-trust-600 text-white shadow-lg shadow-trust-500/30',
-      iconRing: 'ring-trust-100 dark:ring-trust-900/50',
-      border: 'border-trust-100 dark:border-trust-900/50',
-      glow: 'group-hover:shadow-trust-500/40',
-      accent: 'text-trust-600 dark:text-trust-400'
+      icon: 'bg-gradient-to-br from-secondary-400 to-secondary-600 text-white shadow-lg shadow-secondary-500/30',
+      iconRing: 'ring-secondary-100 dark:ring-secondary-900/50',
+      border: 'border-secondary-100 dark:border-secondary-900/50',
+      glow: 'group-hover:shadow-secondary-500/40',
+      accent: 'text-secondary-600 dark:text-secondary-400'
     }
   };
 

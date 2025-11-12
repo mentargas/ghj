@@ -4,7 +4,7 @@ import { DivideIcon as LucideIcon, Loader2 } from 'lucide-react';
 interface ButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
-  variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'ghost' | 'trust' | 'accent';
+  variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'ghost' | 'accent' | 'outline';
   size?: 'sm' | 'md' | 'lg' | 'xl';
   icon?: LucideIcon;
   iconPosition?: 'left' | 'right';
@@ -31,14 +31,14 @@ export default function Button({
   const baseClasses = 'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-sm';
 
   const variantClasses = {
-    primary: 'bg-trust-600 text-white hover:bg-trust-700 focus:ring-trust-500 shadow-trust-600/20 hover:shadow-lg hover:shadow-trust-600/30',
-    secondary: 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-600 focus:ring-neutral-500',
+    primary: 'bg-gradient-to-r from-primary-600 to-primary-500 text-white hover:from-primary-700 hover:to-primary-600 focus:ring-primary-500 shadow-lg shadow-primary-600/30 hover:shadow-xl hover:shadow-primary-600/40',
+    secondary: 'bg-secondary-100 dark:bg-neutral-700 text-primary-700 dark:text-neutral-200 hover:bg-secondary-200 dark:hover:bg-neutral-600 focus:ring-secondary-500 border border-secondary-200',
     success: 'bg-success-600 text-white hover:bg-success-700 focus:ring-success-500 shadow-success-600/20 hover:shadow-lg hover:shadow-success-600/30',
     warning: 'bg-warning-600 text-white hover:bg-warning-700 focus:ring-warning-500 shadow-warning-600/20 hover:shadow-lg hover:shadow-warning-600/30',
     danger: 'bg-error-600 text-white hover:bg-error-700 focus:ring-error-500 shadow-error-600/20 hover:shadow-lg hover:shadow-error-600/30',
-    ghost: 'text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 focus:ring-neutral-500 shadow-none',
-    trust: 'bg-gradient-to-r from-trust-600 to-trust-500 text-white hover:from-trust-700 hover:to-trust-600 focus:ring-trust-500 shadow-lg shadow-trust-600/30 hover:shadow-xl hover:shadow-trust-600/40',
-    accent: 'bg-gradient-to-r from-accent-600 to-accent-500 text-white hover:from-accent-700 hover:to-accent-600 focus:ring-accent-500 shadow-lg shadow-accent-600/30 hover:shadow-xl hover:shadow-accent-600/40'
+    ghost: 'text-primary-600 dark:text-neutral-300 hover:bg-secondary-50 dark:hover:bg-neutral-800 focus:ring-primary-500 shadow-none',
+    accent: 'bg-gradient-to-r from-accent-500 to-accent-400 text-primary-900 hover:from-accent-600 hover:to-accent-500 focus:ring-accent-500 shadow-lg shadow-accent-500/30 hover:shadow-xl hover:shadow-accent-500/40 font-bold',
+    outline: 'bg-transparent border-2 border-primary-500 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 focus:ring-primary-500'
   };
 
   const sizeClasses = {

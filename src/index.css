@@ -37,12 +37,16 @@
     @apply bg-white/90 dark:bg-neutral-800/90 backdrop-blur-xl border border-white/30 dark:border-neutral-700/50 shadow-glass-lg;
   }
 
-  .gradient-trust {
-    @apply bg-gradient-to-br from-trust-500 to-trust-700;
+  .gradient-primary {
+    @apply bg-gradient-to-br from-primary-500 to-primary-900;
+  }
+
+  .gradient-secondary {
+    @apply bg-gradient-to-br from-secondary-400 to-secondary-600;
   }
 
   .gradient-accent {
-    @apply bg-gradient-to-br from-accent-500 to-accent-700;
+    @apply bg-gradient-to-br from-accent-400 to-accent-600;
   }
 
   .gradient-success {
@@ -111,7 +115,7 @@
   }
 
   .input-modern {
-    @apply w-full px-4 py-3 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-xl text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-trust-500 focus:border-transparent transition-all duration-200;
+    @apply w-full px-4 py-3 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-xl text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
   }
 
   .button-modern {
@@ -123,11 +127,11 @@
   }
 
   .sidebar-item-active {
-    @apply bg-gradient-to-r from-trust-600 to-trust-500 text-white shadow-lg shadow-trust-500/30 border border-trust-700/20;
+    @apply bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-lg shadow-primary-500/30 border border-primary-700/20;
   }
 
   .sidebar-item-inactive {
-    @apply text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700/70 hover:text-neutral-900 dark:hover:text-neutral-100 border border-transparent hover:border-neutral-200/50 dark:hover:border-neutral-600/50;
+    @apply text-neutral-700 dark:text-neutral-300 hover:bg-secondary-50 dark:hover:bg-neutral-700/70 hover:text-primary-700 dark:hover:text-neutral-100 border border-transparent hover:border-secondary-200/50 dark:hover:border-neutral-600/50;
   }
 }
 

@@ -198,69 +198,77 @@ export default function LandingPage({ onNavigateTo }: LandingPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30" dir="rtl">
+    <div className="min-h-screen bg-gradient-hero" dir="rtl">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200/60 sticky top-0 z-50">
+      <header className="bg-white/90 backdrop-blur-md border-b border-secondary-200/60 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3 space-x-reverse">
-              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary-600/30">
                 <Shield className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-gray-900">منصة المساعدات الإنسانية</h1>
-                <p className="text-xs text-gray-600">غزة - فلسطين</p>
+                <h1 className="text-lg font-bold text-primary-900">منصة المساعدات الإنسانية</h1>
+                <p className="text-xs text-primary-700">غزة - فلسطين</p>
               </div>
             </div>
             <div className="relative">
               <button
                 onClick={() => setShowAdminMenu(!showAdminMenu)}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 text-sm text-primary-700 hover:bg-secondary-50 rounded-lg transition-all border border-transparent hover:border-secondary-200"
               >
                 <Users className="w-4 h-4" />
                 الدخول الإداري
               </button>
               {showAdminMenu && (
-                <div className="absolute left-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                <div className="absolute left-0 mt-2 w-56 bg-white rounded-xl shadow-elevated border border-secondary-200 py-2 z-50 animate-scale-in">
                   <button
                     onClick={() => onNavigateTo('admin')}
-                    className="w-full px-4 py-3 text-right hover:bg-blue-50 flex items-center gap-3 transition-colors"
+                    className="w-full px-4 py-3 text-right hover:bg-secondary-50 flex items-center gap-3 transition-colors group"
                   >
-                    <Shield className="w-4 h-4 text-blue-600" />
+                    <div className="w-8 h-8 rounded-lg bg-primary-100 group-hover:bg-primary-600 flex items-center justify-center transition-colors">
+                      <Shield className="w-4 h-4 text-primary-600 group-hover:text-white" />
+                    </div>
                     <div>
-                      <p className="font-medium text-gray-900">لوحة الإدمن</p>
-                      <p className="text-xs text-gray-600">التحكم الكامل</p>
+                      <p className="font-medium text-primary-900">لوحة الإدمن</p>
+                      <p className="text-xs text-primary-600">التحكم الكامل</p>
                     </div>
                   </button>
                   <button
                     onClick={() => onNavigateTo('organizations')}
-                    className="w-full px-4 py-3 text-right hover:bg-green-50 flex items-center gap-3 transition-colors"
+                    className="w-full px-4 py-3 text-right hover:bg-secondary-50 flex items-center gap-3 transition-colors group"
                   >
-                    <Building2 className="w-4 h-4 text-green-600" />
+                    <div className="w-8 h-8 rounded-lg bg-success-100 group-hover:bg-success-600 flex items-center justify-center transition-colors">
+                      <Building2 className="w-4 h-4 text-success-600 group-hover:text-white" />
+                    </div>
                     <div>
-                      <p className="font-medium text-gray-900">لوحة المؤسسات</p>
-                      <p className="text-xs text-gray-600">إدارة المؤسسات</p>
+                      <p className="font-medium text-primary-900">لوحة المؤسسات</p>
+                      <p className="text-xs text-primary-600">إدارة المؤسسات</p>
                     </div>
                   </button>
                   <button
                     onClick={() => onNavigateTo('families')}
-                    className="w-full px-4 py-3 text-right hover:bg-purple-50 flex items-center gap-3 transition-colors"
+                    className="w-full px-4 py-3 text-right hover:bg-secondary-50 flex items-center gap-3 transition-colors group"
                   >
-                    <Heart className="w-4 h-4 text-purple-600" />
+                    <div className="w-8 h-8 rounded-lg bg-error-100 group-hover:bg-error-600 flex items-center justify-center transition-colors">
+                      <Heart className="w-4 h-4 text-error-600 group-hover:text-white" />
+                    </div>
                     <div>
-                      <p className="font-medium text-gray-900">لوحة العائلات</p>
-                      <p className="text-xs text-gray-600">إدارة العائلات</p>
+                      <p className="font-medium text-primary-900">لوحة العائلات</p>
+                      <p className="text-xs text-primary-600">إدارة العائلات</p>
                     </div>
                   </button>
-                  <div className="border-t border-gray-200 mt-2 pt-2">
+                  <div className="border-t border-secondary-200 mt-2 pt-2">
                     <button
                       onClick={() => onNavigateTo('beneficiary')}
-                      className="w-full px-4 py-3 text-right hover:bg-blue-50 flex items-center gap-3 transition-colors"
+                      className="w-full px-4 py-3 text-right hover:bg-secondary-50 flex items-center gap-3 transition-colors group"
                     >
-                      <Users className="w-4 h-4 text-blue-600" />
+                      <div className="w-8 h-8 rounded-lg bg-secondary-100 group-hover:bg-primary-600 flex items-center justify-center transition-colors">
+                        <Users className="w-4 h-4 text-primary-600 group-hover:text-white" />
+                      </div>
                       <div>
-                        <p className="font-medium text-gray-900">بوابة المستفيدين</p>
-                        <p className="text-xs text-gray-600">حسابي الشخصي</p>
+                        <p className="font-medium text-primary-900">بوابة المستفيدين</p>
+                        <p className="text-xs text-primary-600">حسابي الشخصي</p>
                       </div>
                     </button>
                   </div>
@@ -274,14 +282,14 @@ export default function LandingPage({ onNavigateTo }: LandingPageProps) {
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Hero Section */}
-        <div className="text-center mb-12">
-          <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+        <div className="text-center mb-12 animate-fade-in">
+          <div className="w-20 h-20 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-elevated shadow-primary-600/40 animate-float">
             <Search className="w-10 h-10 text-white" />
           </div>
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-primary-900 mb-4">
             ابحث عن معلومات طردك
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-primary-700 max-w-2xl mx-auto">
             أدخل رقم الهوية الوطني للاطلاع على حالة الطرود والمساعدات المخصصة لك
           </p>
         </div>
