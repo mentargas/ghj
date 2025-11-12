@@ -1,6 +1,20 @@
 import { useCallback } from 'react';
 
-// نظام تسجيل الأخطاء
+export interface APIRequestDetails {
+  url?: string;
+  method?: string;
+  headers?: Record<string, string>;
+  bodySize?: number;
+  timeout?: number;
+}
+
+export interface APIResponseDetails {
+  status?: number;
+  statusText?: string;
+  responseTime?: number;
+  body?: any;
+}
+
 export interface ErrorLog {
   id: string;
   timestamp: string;
@@ -13,6 +27,11 @@ export interface ErrorLog {
   userAgent?: string;
   url?: string;
   userId?: string;
+  type?: 'network' | 'timeout' | 'authentication' | 'validation' | 'server_error' | 'encryption' | 'unknown';
+  userMessage?: string;
+  suggestion?: string;
+  request?: APIRequestDetails;
+  response?: APIResponseDetails;
 }
 
 class ErrorLogger {
@@ -21,7 +40,7 @@ class ErrorLogger {
 
   logError(error: Error, component?: string, additionalInfo?: any) {
     const errorLog: ErrorLog = {
-      id: Date.now().toString(),
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
       timestamp: new Date().toISOString(),
       level: 'error',
       message: error.message,
@@ -33,21 +52,22 @@ class ErrorLogger {
     };
 
     this.errors.unshift(errorLog);
-    
-    // الاحتفاظ بآخر 100 خطأ فقط
+
     if (this.errors.length > this.maxErrors) {
       this.errors = this.errors.slice(0, this.maxErrors);
     }
 
-    // طباعة الخطأ في الكونسول للتطوير
     console.error('🔴 خطأ في التطبيق:', {
       component,
       message: error.message,
+      type: additionalInfo?.type,
+      userMessage: additionalInfo?.userMessage,
       stack: error.stack,
-      timestamp: errorLog.timestamp
+      timestamp: errorLog.timestamp,
+      request: additionalInfo?.request,
+      response: additionalInfo?.response,
     });
 
-    // حفظ في localStorage للاستمرارية
     this.saveToStorage();
   }
 
@@ -115,6 +135,14 @@ class ErrorLogger {
 
   getErrorsByComponent(component: string): ErrorLog[] {
     return this.errors.filter(error => error.component === component);
+  }
+
+  getErrorsByType(type: string): ErrorLog[] {
+    return this.errors.filter(error => error.type === type);
+  }
+
+  getAPIErrors(): ErrorLog[] {
+    return this.errors.filter(error => error.request || error.response);
   }
 
   clearErrors() {

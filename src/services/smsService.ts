@@ -1,4 +1,6 @@
 import { supabase } from '../lib/supabaseClient';
+import { APIErrorHandler } from '../utils/apiErrorHandler';
+import { withRetry } from '../utils/apiHelpers';
 
 export interface SMSSettings {
   id: string;
@@ -59,14 +61,34 @@ export interface BalanceResponse {
 
 export const smsService = {
   async encrypt(text: string): Promise<string> {
-    return btoa(encodeURIComponent(text));
+    try {
+      if (!text || text.trim() === '') {
+        throw APIErrorHandler.createEncryptionError('encrypt', new Error('نص فارغ'));
+      }
+      return btoa(encodeURIComponent(text));
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('Invalid')) {
+        throw APIErrorHandler.createEncryptionError('encrypt', error);
+      }
+      throw error;
+    }
   },
 
   async decrypt(encrypted: string): Promise<string> {
     try {
-      return decodeURIComponent(atob(encrypted));
-    } catch {
-      return encrypted;
+      if (!encrypted || encrypted.trim() === '') {
+        throw APIErrorHandler.createEncryptionError('decrypt', new Error('بيانات مشفرة فارغة'));
+      }
+      const decrypted = decodeURIComponent(atob(encrypted));
+      if (!decrypted) {
+        throw APIErrorHandler.createEncryptionError('decrypt', new Error('فشل فك التشفير'));
+      }
+      return decrypted;
+    } catch (error) {
+      if (error instanceof Error && !error.message.includes('فشل')) {
+        throw APIErrorHandler.createEncryptionError('decrypt', error);
+      }
+      throw error;
     }
   },
 
@@ -149,25 +171,30 @@ export const smsService = {
     const settings = await this.getSettings();
 
     if (!settings) {
-      return { success: false, error: 'SMS service not configured' };
+      return { success: false, error: 'خدمة SMS غير مُعدة. يرجى إدخال بيانات الاتصال أولاً.' };
     }
 
     if (!settings.is_active) {
-      return { success: false, error: 'SMS service is not active' };
+      return { success: false, error: 'خدمة SMS غير مفعلة. يرجى تفعيلها من الإعدادات.' };
     }
 
     try {
       const apiKey = await this.decrypt(settings.api_key);
 
-      const response = await fetch('https://tweetsms.ps/api.php/maan/chk_balance', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          api_key: apiKey,
-        }),
-      });
+      const response = await APIErrorHandler.fetchWithErrorHandling(
+        'https://tweetsms.ps/api.php/maan/chk_balance',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            api_key: apiKey,
+          }),
+          timeout: 15000,
+          serviceName: 'TweetSMS',
+        }
+      );
 
       const result = await response.json();
 
@@ -184,12 +211,18 @@ export const smsService = {
 
         return { success: true, balance };
       } else {
-        return { success: false, error: result.message || 'Failed to get balance' };
+        const errorInfo = APIErrorHandler.translateTweetSMSError(result.code?.toString() || '-999');
+        return {
+          success: false,
+          error: `${errorInfo.message}. ${errorInfo.suggestion}`
+        };
       }
-    } catch (error) {
+    } catch (error: any) {
+      const userMessage = APIErrorHandler.getUserFriendlyMessage(error);
+      const suggestion = APIErrorHandler.getSuggestion(error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: suggestion ? `${userMessage}. ${suggestion}` : userMessage
       };
     }
   },
@@ -204,17 +237,17 @@ export const smsService = {
     const settings = await this.getSettings();
 
     if (!settings || !settings.is_active) {
-      return { success: false, error: 'SMS service not configured' };
+      return { success: false, error: 'خدمة SMS غير مُعدة أو غير مفعلة' };
     }
 
     if (!this.validatePhoneNumber(phoneNumber)) {
-      return { success: false, error: 'Invalid phone number format' };
+      return { success: false, error: 'صيغة رقم الهاتف غير صحيحة. يجب أن يبدأ بـ 05 أو 972' };
     }
 
     await supabase?.rpc('reset_daily_sms_count');
 
     if (settings.current_daily_count >= settings.max_daily_limit) {
-      return { success: false, error: 'Daily SMS limit reached' };
+      return { success: false, error: `تم الوصول للحد اليومي (${settings.max_daily_limit} رسالة). يرجى المحاولة غداً.` };
     }
 
     const formattedPhone = this.formatPhoneNumber(phoneNumber);
@@ -237,25 +270,30 @@ export const smsService = {
       .single();
 
     if (logError) {
-      return { success: false, error: logError.message };
+      return { success: false, error: `فشل حفظ سجل الرسالة: ${logError.message}` };
     }
 
     try {
       const apiKey = await this.decrypt(settings.api_key);
       const sender = settings.sender_name;
 
-      const response = await fetch('https://tweetsms.ps/api.php/maan/sendsms', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          api_key: apiKey,
-          to: formattedPhone,
-          message: message,
-          sender: sender,
-        }),
-      });
+      const response = await APIErrorHandler.fetchWithErrorHandling(
+        'https://tweetsms.ps/api.php/maan/sendsms',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            api_key: apiKey,
+            to: formattedPhone,
+            message: message,
+            sender: sender,
+          }),
+          timeout: 20000,
+          serviceName: 'TweetSMS',
+        }
+      );
 
       const result = await response.json();
       const resultCode = result.code?.toString() || '-999';
@@ -264,42 +302,21 @@ export const smsService = {
       let status: 'sent' | 'failed' = 'failed';
       let errorMessage: string | undefined;
 
-      switch (resultCode) {
-        case '999':
-          status = 'sent';
-          await supabase!
-            .from('sms_api_settings')
-            .update({
-              current_daily_count: settings.current_daily_count + 1,
-            })
-            .eq('id', settings.id);
-          break;
-        case '-100':
-          errorMessage = 'Missing parameters';
-          break;
-        case '-110':
-          errorMessage = 'Wrong username or password';
-          break;
-        case '-113':
-          errorMessage = 'Not enough balance';
-          if (settings.low_balance_alert_enabled) {
-            await this.checkBalance();
-          }
-          break;
-        case '-115':
-          errorMessage = 'Sender not available';
-          break;
-        case '-116':
-          errorMessage = 'Invalid sender name';
-          break;
-        case '-2':
-          errorMessage = 'Invalid destination or country not supported';
-          break;
-        case '-999':
-          errorMessage = 'Failed to send by SMS provider';
-          break;
-        default:
-          errorMessage = `Unknown error: ${resultCode}`;
+      if (resultCode === '999') {
+        status = 'sent';
+        await supabase!
+          .from('sms_api_settings')
+          .update({
+            current_daily_count: settings.current_daily_count + 1,
+          })
+          .eq('id', settings.id);
+      } else {
+        const errorInfo = APIErrorHandler.translateTweetSMSError(resultCode);
+        errorMessage = `${errorInfo.message} - ${errorInfo.suggestion}`;
+
+        if (resultCode === '-113' && settings.low_balance_alert_enabled) {
+          await this.checkBalance();
+        }
       }
 
       await supabase!
@@ -322,19 +339,21 @@ export const smsService = {
         message: status === 'sent' ? 'SMS sent successfully' : errorMessage,
       };
 
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    } catch (error: any) {
+      const userMessage = APIErrorHandler.getUserFriendlyMessage(error);
+      const suggestion = APIErrorHandler.getSuggestion(error);
+      const fullError = suggestion ? `${userMessage}. ${suggestion}` : userMessage;
 
       await supabase!
         .from('sms_logs')
         .update({
           status: 'failed',
-          error_message: errorMessage,
+          error_message: fullError,
           failed_at: new Date().toISOString(),
         })
         .eq('id', logData.id);
 
-      return { success: false, error: errorMessage };
+      return { success: false, error: fullError };
     }
   },
 

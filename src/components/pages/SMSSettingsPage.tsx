@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, Send, RefreshCw, Eye, EyeOff, Save, CheckCircle, AlertTriangle, Smartphone, DollarSign, Settings, BarChart3, Clock, X, TrendingUp } from 'lucide-react';
+import { MessageSquare, Send, RefreshCw, Eye, EyeOff, Save, CheckCircle, AlertTriangle, Smartphone, DollarSign, Settings, BarChart3, Clock, X, TrendingUp, Activity } from 'lucide-react';
 import { Button, Card, Input, Badge, Modal } from '../ui';
 import { smsService, SMSSettings, SMSLog } from '../../services/smsService';
 import { useErrorLogger } from '../../utils/errorLogger';
+import { APIDiagnostics } from './APIDiagnostics';
+import { ConnectionStatusBanner } from './ConnectionStatusBanner';
 
 export default function SMSSettingsPage() {
   const { logInfo, logError } = useErrorLogger();
@@ -39,6 +41,17 @@ export default function SMSSettingsPage() {
   const [statsLoading, setStatsLoading] = useState(false);
   const [statsDays, setStatsDays] = useState(30);
 
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<{
+    isConnected: boolean;
+    lastSuccessfulCheck?: string;
+    lastError?: { message: string; timestamp: string };
+    isActive: boolean;
+  }>({
+    isConnected: false,
+    isActive: false,
+  });
+
   useEffect(() => {
     loadSettings();
   }, []);
@@ -60,6 +73,11 @@ export default function SMSSettingsPage() {
         if (data.last_balance_amount) {
           setBalance(data.last_balance_amount);
         }
+        setConnectionStatus({
+          isConnected: !!data.last_balance_check,
+          lastSuccessfulCheck: data.last_balance_check,
+          isActive: data.is_active,
+        });
       }
     } catch (error) {
       logError(error as Error, 'SMSSettingsPage.loadSettings');
@@ -105,8 +123,21 @@ export default function SMSSettingsPage() {
       if (result.success && result.balance !== undefined) {
         setBalance(result.balance);
         showNotification(`الرصيد الحالي: ${result.balance} رسالة`, 'success');
+        setConnectionStatus({
+          isConnected: true,
+          lastSuccessfulCheck: new Date().toISOString(),
+          isActive: settings.is_active || false,
+        });
       } else {
         showNotification(result.error || 'فشل الاستعلام عن الرصيد', 'error');
+        setConnectionStatus({
+          isConnected: false,
+          lastError: {
+            message: result.error || 'فشل الاستعلام عن الرصيد',
+            timestamp: new Date().toISOString(),
+          },
+          isActive: settings.is_active || false,
+        });
       }
     } catch (error) {
       logError(error as Error, 'SMSSettingsPage.handleCheckBalance');
@@ -235,6 +266,8 @@ export default function SMSSettingsPage() {
           </button>
         </div>
       )}
+
+      <ConnectionStatusBanner status={connectionStatus} />
 
       <div className="flex items-center justify-between">
         <div>
@@ -424,6 +457,15 @@ export default function SMSSettingsPage() {
                   disabled={loading || !settings.is_active}
                 >
                   فحص الرصيد
+                </Button>
+                <Button
+                  variant="secondary"
+                  icon={Activity}
+                  iconPosition="right"
+                  onClick={() => setShowDiagnostics(true)}
+                  disabled={loading || !settings.api_key || !settings.sender_name}
+                >
+                  تشخيص الاتصال
                 </Button>
               </div>
             </div>
@@ -709,6 +751,15 @@ export default function SMSSettingsPage() {
             </div>
           </div>
         </Card>
+      )}
+
+      {showDiagnostics && (
+        <APIDiagnostics
+          apiKey={settings.api_key || ''}
+          senderName={settings.sender_name || ''}
+          apiUrl={settings.api_url || 'https://tweetsms.ps/api.php/maan'}
+          onClose={() => setShowDiagnostics(false)}
+        />
       )}
     </div>
   );

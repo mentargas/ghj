@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bug, X, Trash2, Download, Filter, AlertTriangle, AlertCircle, Info, Copy, CheckCircle } from 'lucide-react'; // No change needed for icons
+import { Bug, X, Trash2, Download, Filter, AlertTriangle, AlertCircle, Info, Copy, CheckCircle, Globe, Clock, Zap } from 'lucide-react';
 import { errorLogger, ErrorLog, useErrorLogger } from '../utils/errorLogger';
 
 interface ErrorConsoleProps {
@@ -9,7 +9,7 @@ interface ErrorConsoleProps {
 
 export const ErrorConsole: React.FC<ErrorConsoleProps> = ({ isOpen, onClose }) => {
   const [errors, setErrors] = useState<ErrorLog[]>([]);
-  const [filter, setFilter] = useState<'all' | 'error' | 'warning' | 'info'>('all');
+  const [filter, setFilter] = useState<'all' | 'error' | 'warning' | 'info' | 'api'>('all');
   const [selectedError, setSelectedError] = useState<ErrorLog | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const { clearErrors } = useErrorLogger();
@@ -18,7 +18,14 @@ export const ErrorConsole: React.FC<ErrorConsoleProps> = ({ isOpen, onClose }) =
     if (isOpen) {
       const updateErrors = () => {
         const allErrors = errorLogger.getErrors();
-        const filteredErrors = filter === 'all' ? allErrors : allErrors.filter(e => e.level === filter);
+        let filteredErrors;
+        if (filter === 'all') {
+          filteredErrors = allErrors;
+        } else if (filter === 'api') {
+          filteredErrors = errorLogger.getAPIErrors();
+        } else {
+          filteredErrors = allErrors.filter(e => e.level === filter);
+        }
         setErrors(filteredErrors);
       };
 
@@ -119,6 +126,7 @@ export const ErrorConsole: React.FC<ErrorConsoleProps> = ({ isOpen, onClose }) =
                 <option value="error">أخطاء ({errorLogger.getErrorsByLevel('error').length})</option>
                 <option value="warning">تحذيرات ({errorLogger.getErrorsByLevel('warning').length})</option>
                 <option value="info">معلومات ({errorLogger.getErrorsByLevel('info').length})</option>
+                <option value="api">أخطاء API ({errorLogger.getAPIErrors().length})</option>
               </select>
             </div>
           </div>
@@ -234,6 +242,97 @@ export const ErrorConsole: React.FC<ErrorConsoleProps> = ({ isOpen, onClose }) =
                     </p>
                   </div>
 
+                  {selectedError.type && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">نوع الخطأ</label>
+                      <p className="text-sm bg-gray-50 p-3 rounded-lg">{selectedError.type}</p>
+                    </div>
+                  )}
+
+                  {selectedError.userMessage && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">رسالة المستخدم</label>
+                      <p className="text-sm bg-blue-50 p-3 rounded-lg text-blue-900">{selectedError.userMessage}</p>
+                    </div>
+                  )}
+
+                  {selectedError.suggestion && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">الحل المقترح</label>
+                      <div className="flex items-start space-x-2 space-x-reverse bg-yellow-50 p-3 rounded-lg">
+                        <AlertTriangle className="w-4 h-4 text-yellow-600 flex-shrink-0 mt-0.5" />
+                        <p className="text-sm text-yellow-900">{selectedError.suggestion}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedError.request && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <Globe className="w-4 h-4 inline ml-1" />
+                        تفاصيل الطلب (API Request)
+                      </label>
+                      <div className="bg-gray-50 p-3 rounded-lg space-y-2">
+                        {selectedError.request.url && (
+                          <div className="text-xs">
+                            <span className="font-medium text-gray-700">URL:</span>
+                            <p className="text-gray-600 break-all mt-1">{selectedError.request.url}</p>
+                          </div>
+                        )}
+                        {selectedError.request.method && (
+                          <div className="text-xs">
+                            <span className="font-medium text-gray-700">الطريقة:</span>
+                            <span className="text-gray-600 ml-2">{selectedError.request.method}</span>
+                          </div>
+                        )}
+                        {selectedError.request.timeout && (
+                          <div className="text-xs">
+                            <span className="font-medium text-gray-700">المهلة:</span>
+                            <span className="text-gray-600 ml-2">{selectedError.request.timeout}ms</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedError.response && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <Zap className="w-4 h-4 inline ml-1" />
+                        تفاصيل الاستجابة (API Response)
+                      </label>
+                      <div className="bg-gray-50 p-3 rounded-lg space-y-2">
+                        {selectedError.response.status && (
+                          <div className="text-xs">
+                            <span className="font-medium text-gray-700">حالة الاستجابة:</span>
+                            <span className={`ml-2 px-2 py-0.5 rounded ${
+                              selectedError.response.status >= 500 ? 'bg-red-100 text-red-700' :
+                              selectedError.response.status >= 400 ? 'bg-orange-100 text-orange-700' :
+                              'bg-green-100 text-green-700'
+                            }`}>
+                              {selectedError.response.status} {selectedError.response.statusText}
+                            </span>
+                          </div>
+                        )}
+                        {selectedError.response.responseTime && (
+                          <div className="text-xs">
+                            <Clock className="w-3 h-3 inline ml-1" />
+                            <span className="font-medium text-gray-700">زمن الاستجابة:</span>
+                            <span className="text-gray-600 ml-2">{selectedError.response.responseTime}ms</span>
+                          </div>
+                        )}
+                        {selectedError.response.body && (
+                          <div className="text-xs">
+                            <span className="font-medium text-gray-700">محتوى الاستجابة:</span>
+                            <pre className="text-xs bg-gray-800 text-green-400 p-2 rounded mt-1 overflow-x-auto max-h-32">
+                              {JSON.stringify(selectedError.response.body, null, 2)}
+                            </pre>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   {selectedError.url && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">الرابط</label>
@@ -244,7 +343,7 @@ export const ErrorConsole: React.FC<ErrorConsoleProps> = ({ isOpen, onClose }) =
                   {selectedError.stack && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Stack Trace</label>
-                      <pre className="text-xs bg-gray-800 text-green-400 p-3 rounded-lg overflow-x-auto">
+                      <pre className="text-xs bg-gray-800 text-green-400 p-3 rounded-lg overflow-x-auto max-h-48">
                         {selectedError.stack}
                       </pre>
                     </div>
