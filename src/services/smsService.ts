@@ -65,7 +65,18 @@ export const smsService = {
       if (!text || text.trim() === '') {
         throw APIErrorHandler.createEncryptionError('encrypt', new Error('نص فارغ'));
       }
-      return btoa(encodeURIComponent(text));
+
+      // Use TextEncoder to properly handle UTF-8 characters including Arabic
+      const encoder = new TextEncoder();
+      const data = encoder.encode(text);
+
+      // Convert to base64 using a safe method that handles all characters
+      let binary = '';
+      const len = data.byteLength;
+      for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(data[i]);
+      }
+      return btoa(binary);
     } catch (error) {
       if (error instanceof Error && error.message.includes('Invalid')) {
         throw APIErrorHandler.createEncryptionError('encrypt', error);
@@ -79,7 +90,20 @@ export const smsService = {
       if (!encrypted || encrypted.trim() === '') {
         throw APIErrorHandler.createEncryptionError('decrypt', new Error('بيانات مشفرة فارغة'));
       }
-      const decrypted = decodeURIComponent(atob(encrypted));
+
+      // Decode from base64
+      const binary = atob(encrypted);
+
+      // Convert binary string to Uint8Array
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+
+      // Use TextDecoder to properly decode UTF-8 characters including Arabic
+      const decoder = new TextDecoder();
+      const decrypted = decoder.decode(bytes);
+
       if (!decrypted) {
         throw APIErrorHandler.createEncryptionError('decrypt', new Error('فشل فك التشفير'));
       }

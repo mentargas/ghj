@@ -1,5 +1,17 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { type Alert, mockAlerts } from '../data/mockData';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { alertsService } from '../services/supabaseService';
+
+export interface Alert {
+  id: string;
+  type: 'delayed' | 'failed' | 'expired' | 'urgent';
+  title: string;
+  description: string;
+  relatedId: string;
+  relatedType: 'package' | 'beneficiary' | 'task';
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  isRead: boolean;
+  createdAt: string;
+}
 
 interface AlertsContextType {
   alerts: Alert[];
@@ -26,7 +38,19 @@ interface AlertsProviderProps {
 }
 
 export const AlertsProvider: React.FC<AlertsProviderProps> = ({ children }) => {
-  const [alerts, setAlerts] = useState<Alert[]>(mockAlerts);
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+
+  useEffect(() => {
+    const loadAlerts = async () => {
+      try {
+        const data = await alertsService.getAll();
+        setAlerts(data);
+      } catch (error) {
+        console.error('Failed to load alerts:', error);
+      }
+    };
+    loadAlerts();
+  }, []);
 
   const unreadAlerts = alerts.filter(alert => !alert.isRead);
   const criticalAlerts = alerts.filter(alert => alert.priority === 'critical' && !alert.isRead);

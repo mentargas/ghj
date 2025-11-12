@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { type Beneficiary, mockBeneficiaries } from '../data/mockData';
-import { useErrorLogger } from '../utils/errorLogger';
+import { beneficiariesService } from '../services/supabaseService';
+import type { Beneficiary } from '../data/mockData';
 
 interface UseBeneficiariesOptions {
   organizationId?: string;
@@ -14,64 +14,51 @@ export const useBeneficiaries = (options: UseBeneficiariesOptions = {}) => {
   const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { logInfo, logError } = useErrorLogger();
 
-  // جلب البيانات
   useEffect(() => {
     const fetchBeneficiaries = async () => {
       try {
         setLoading(true);
         setError(null);
-        
-        // محاكاة تأخير الشبكة
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        let filteredData = [...mockBeneficiaries];
-        
-        // فلترة حسب المؤسسة
+
+        let data: Beneficiary[];
         if (options.organizationId) {
-          filteredData = filteredData.filter(b => b.organizationId === options.organizationId);
+          data = await beneficiariesService.getByOrganization(options.organizationId);
+        } else if (options.familyId) {
+          data = await beneficiariesService.getByFamily(options.familyId);
+        } else {
+          data = await beneficiariesService.getAll();
         }
-        
-        // فلترة حسب العائلة
-        if (options.familyId) {
-          filteredData = filteredData.filter(b => b.familyId === options.familyId);
-        }
-        
-        setBeneficiaries(filteredData);
-        logInfo(`تم تحميل ${filteredData.length} مستفيد`, 'useBeneficiaries');
+
+        setBeneficiaries(data);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'خطأ في تحميل المستفيدين';
         setError(errorMessage);
-        logError(new Error(errorMessage), 'useBeneficiaries');
+        console.error(errorMessage, err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchBeneficiaries();
-  }, [options.organizationId, options.familyId, logInfo, logError]);
+  }, [options.organizationId, options.familyId]);
 
-  // فلترة البيانات بناءً على البحث والفلاتر
   const filteredBeneficiaries = useMemo(() => {
     let filtered = [...beneficiaries];
 
-    // فلترة البحث
     if (options.searchTerm) {
       const searchLower = options.searchTerm.toLowerCase();
-      filtered = filtered.filter(b => 
+      filtered = filtered.filter(b =>
         b.name.toLowerCase().includes(searchLower) ||
         b.nationalId.includes(options.searchTerm!) ||
         b.phone.includes(options.searchTerm!)
       );
     }
 
-    // فلترة الحالة
     if (options.statusFilter && options.statusFilter !== 'all') {
       filtered = filtered.filter(b => b.status === options.statusFilter);
     }
 
-    // فلترة حالة الهوية
     if (options.identityStatusFilter && options.identityStatusFilter !== 'all') {
       filtered = filtered.filter(b => b.identityStatus === options.identityStatusFilter);
     }
@@ -79,7 +66,6 @@ export const useBeneficiaries = (options: UseBeneficiariesOptions = {}) => {
     return filtered;
   }, [beneficiaries, options.searchTerm, options.statusFilter, options.identityStatusFilter]);
 
-  // إحصائيات
   const statistics = useMemo(() => {
     return {
       total: beneficiaries.length,
@@ -91,57 +77,15 @@ export const useBeneficiaries = (options: UseBeneficiariesOptions = {}) => {
     };
   }, [beneficiaries]);
 
-  // وظائف CRUD (محاكاة)
   const addBeneficiary = async (beneficiaryData: Partial<Beneficiary>) => {
     try {
       setLoading(true);
-      
-      // محاكاة إضافة مستفيد جديد
-      const newBeneficiary: Beneficiary = {
-        id: `new-${Date.now()}`,
-        name: beneficiaryData.name || '',
-        fullName: beneficiaryData.fullName || '',
-        nationalId: beneficiaryData.nationalId || '',
-        dateOfBirth: beneficiaryData.dateOfBirth || '',
-        gender: beneficiaryData.gender || 'male',
-        phone: beneficiaryData.phone || '',
-        address: beneficiaryData.address || '',
-        detailedAddress: beneficiaryData.detailedAddress || {
-          governorate: '',
-          city: '',
-          district: '',
-          street: '',
-          additionalInfo: ''
-        },
-        location: beneficiaryData.location || { lat: 31.3469, lng: 34.3029 },
-        organizationId: beneficiaryData.organizationId,
-        familyId: beneficiaryData.familyId,
-        relationToFamily: beneficiaryData.relationToFamily,
-        profession: beneficiaryData.profession || '',
-        maritalStatus: beneficiaryData.maritalStatus || 'single',
-        economicLevel: beneficiaryData.economicLevel || 'poor',
-        membersCount: beneficiaryData.membersCount || 1,
-        additionalDocuments: beneficiaryData.additionalDocuments || [],
-        identityStatus: 'pending',
-        identityImageUrl: beneficiaryData.identityImageUrl,
-        status: 'active',
-        eligibilityStatus: 'under_review',
-        lastReceived: new Date().toISOString().split('T')[0],
-        totalPackages: 0,
-        notes: beneficiaryData.notes || '',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        createdBy: 'admin',
-        updatedBy: 'admin'
-      };
-
+      const newBeneficiary = await beneficiariesService.create(beneficiaryData);
       setBeneficiaries(prev => [newBeneficiary, ...prev]);
-      logInfo(`تم إضافة مستفيد جديد: ${newBeneficiary.name}`, 'useBeneficiaries');
       return newBeneficiary;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'خطأ في إضافة المستفيد';
       setError(errorMessage);
-      logError(new Error(errorMessage), 'useBeneficiaries');
       throw err;
     } finally {
       setLoading(false);
@@ -151,20 +95,17 @@ export const useBeneficiaries = (options: UseBeneficiariesOptions = {}) => {
   const updateBeneficiary = async (id: string, updates: Partial<Beneficiary>) => {
     try {
       setLoading(true);
-      
-      setBeneficiaries(prev => 
-        prev.map(b => 
-          b.id === id 
+      await beneficiariesService.update(id, updates);
+      setBeneficiaries(prev =>
+        prev.map(b =>
+          b.id === id
             ? { ...b, ...updates, updatedAt: new Date().toISOString() }
             : b
         )
       );
-      
-      logInfo(`تم تحديث المستفيد: ${id}`, 'useBeneficiaries');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'خطأ في تحديث المستفيد';
       setError(errorMessage);
-      logError(new Error(errorMessage), 'useBeneficiaries');
       throw err;
     } finally {
       setLoading(false);
@@ -174,22 +115,20 @@ export const useBeneficiaries = (options: UseBeneficiariesOptions = {}) => {
   const deleteBeneficiary = async (id: string) => {
     try {
       setLoading(true);
-      
+      await beneficiariesService.delete(id);
       setBeneficiaries(prev => prev.filter(b => b.id !== id));
-      logInfo(`تم حذف المستفيد: ${id}`, 'useBeneficiaries');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'خطأ في حذف المستفيد';
       setError(errorMessage);
-      logError(new Error(errorMessage), 'useBeneficiaries');
       throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  const refetch = () => {
-    // إعادة تحميل البيانات
-    setBeneficiaries([...mockBeneficiaries]);
+  const refetch = async () => {
+    const data = await beneficiariesService.getAll();
+    setBeneficiaries(data);
   };
 
   return {
@@ -205,20 +144,28 @@ export const useBeneficiaries = (options: UseBeneficiariesOptions = {}) => {
   };
 };
 
-// Hook مخصص للحصول على مستفيد واحد
 export const useBeneficiary = (id: string) => {
   const [beneficiary, setBeneficiary] = useState<Beneficiary | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (id) {
-      setLoading(true);
-      const found = mockBeneficiaries.find(b => b.id === id);
-      setBeneficiary(found || null);
-      setError(found ? null : 'المستفيد غير موجود');
-      setLoading(false);
-    }
+    const fetchBeneficiary = async () => {
+      if (id) {
+        setLoading(true);
+        try {
+          const data = await beneficiariesService.getById(id);
+          setBeneficiary(data);
+          setError(data ? null : 'المستفيد غير موجود');
+        } catch (err) {
+          setError('خطأ في تحميل بيانات المستفيد');
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchBeneficiary();
   }, [id]);
 
   return { beneficiary, loading, error };
