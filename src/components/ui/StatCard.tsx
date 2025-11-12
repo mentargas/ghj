@@ -1,5 +1,5 @@
 import React from 'react';
-import { DivideIcon as LucideIcon, TrendingUp, TrendingDown } from 'lucide-react';
+import { DivideIcon as LucideIcon, TrendingUp, TrendingDown, ArrowUp, ArrowDown } from 'lucide-react';
 
 interface StatCardProps {
   title: string;
@@ -10,8 +10,9 @@ interface StatCardProps {
     direction: 'up' | 'down';
     label: string;
   };
-  color?: 'blue' | 'green' | 'orange' | 'purple' | 'red';
+  color?: 'trust' | 'accent' | 'success' | 'warning' | 'error' | 'info';
   className?: string;
+  loading?: boolean;
 }
 
 const StatCard = React.memo(function StatCard({
@@ -19,65 +20,98 @@ const StatCard = React.memo(function StatCard({
   value,
   icon: Icon,
   trend,
-  color = 'blue',
-  className = ''
+  color = 'trust',
+  className = '',
+  loading = false
 }: StatCardProps) {
   const colorClasses = {
-    blue: {
-      icon: 'bg-gradient-to-br from-blue-500 to-blue-600 text-white',
-      border: 'border-blue-100',
-      trend: 'text-blue-600'
+    trust: {
+      icon: 'bg-gradient-to-br from-trust-500 to-trust-600 text-white shadow-lg shadow-trust-500/30',
+      iconRing: 'ring-trust-100 dark:ring-trust-900/50',
+      border: 'border-trust-100 dark:border-trust-900/50',
+      glow: 'group-hover:shadow-trust-500/40',
+      accent: 'text-trust-600 dark:text-trust-400'
     },
-    green: {
-      icon: 'bg-gradient-to-br from-green-500 to-green-600 text-white',
-      border: 'border-green-100',
-      trend: 'text-green-600'
+    accent: {
+      icon: 'bg-gradient-to-br from-accent-500 to-accent-600 text-white shadow-lg shadow-accent-500/30',
+      iconRing: 'ring-accent-100 dark:ring-accent-900/50',
+      border: 'border-accent-100 dark:border-accent-900/50',
+      glow: 'group-hover:shadow-accent-500/40',
+      accent: 'text-accent-600 dark:text-accent-400'
     },
-    orange: {
-      icon: 'bg-gradient-to-br from-orange-500 to-orange-600 text-white',
-      border: 'border-orange-100',
-      trend: 'text-orange-600'
+    success: {
+      icon: 'bg-gradient-to-br from-success-500 to-success-600 text-white shadow-lg shadow-success-500/30',
+      iconRing: 'ring-success-100 dark:ring-success-900/50',
+      border: 'border-success-100 dark:border-success-900/50',
+      glow: 'group-hover:shadow-success-500/40',
+      accent: 'text-success-600 dark:text-success-400'
     },
-    purple: {
-      icon: 'bg-gradient-to-br from-purple-500 to-purple-600 text-white',
-      border: 'border-purple-100',
-      trend: 'text-purple-600'
+    warning: {
+      icon: 'bg-gradient-to-br from-warning-500 to-warning-600 text-white shadow-lg shadow-warning-500/30',
+      iconRing: 'ring-warning-100 dark:ring-warning-900/50',
+      border: 'border-warning-100 dark:border-warning-900/50',
+      glow: 'group-hover:shadow-warning-500/40',
+      accent: 'text-warning-600 dark:text-warning-400'
     },
-    red: {
-      icon: 'bg-gradient-to-br from-red-500 to-red-600 text-white',
-      border: 'border-red-100',
-      trend: 'text-red-600'
+    error: {
+      icon: 'bg-gradient-to-br from-error-500 to-error-600 text-white shadow-lg shadow-error-500/30',
+      iconRing: 'ring-error-100 dark:ring-error-900/50',
+      border: 'border-error-100 dark:border-error-900/50',
+      glow: 'group-hover:shadow-error-500/40',
+      accent: 'text-error-600 dark:text-error-400'
+    },
+    info: {
+      icon: 'bg-gradient-to-br from-trust-500 to-trust-600 text-white shadow-lg shadow-trust-500/30',
+      iconRing: 'ring-trust-100 dark:ring-trust-900/50',
+      border: 'border-trust-100 dark:border-trust-900/50',
+      glow: 'group-hover:shadow-trust-500/40',
+      accent: 'text-trust-600 dark:text-trust-400'
     }
   };
 
   const trendColorClasses = {
-    up: 'text-success-600 bg-success-50',
-    down: 'text-danger-600 bg-danger-50'
+    up: 'text-success-700 dark:text-success-400 bg-success-50 dark:bg-success-900/30 border-success-200 dark:border-success-800',
+    down: 'text-error-700 dark:text-error-400 bg-error-50 dark:bg-error-900/30 border-error-200 dark:border-error-800'
   };
 
+  if (loading) {
+    return (
+      <div className={`stat-card group ${colorClasses[color].border} ${className}`}>
+        <div className="flex items-start justify-between">
+          <div className="flex-1 space-y-3">
+            <div className="skeleton h-4 w-24 rounded"></div>
+            <div className="skeleton h-8 w-32 rounded"></div>
+            <div className="skeleton h-5 w-20 rounded-full"></div>
+          </div>
+          <div className="skeleton w-16 h-16 rounded-2xl"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className={`relative overflow-hidden bg-white p-6 rounded-2xl border ${colorClasses[color].border} shadow-soft hover:shadow-elevated transition-all duration-300 hover:-translate-y-1 group ${className}`}>
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-current to-transparent opacity-0 group-hover:opacity-20 transition-opacity" style={{ color: colorClasses[color].trend }}></div>
+    <div className={`stat-card group ${colorClasses[color].border} ${colorClasses[color].glow} ${className}`}>
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-current to-transparent opacity-0 group-hover:opacity-30 transition-opacity ${colorClasses[color].accent}"></div>
 
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-gray-500 mb-2">{title}</p>
-          <p className="text-3xl font-bold text-gray-900 mb-3 tracking-tight">{value}</p>
+          <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-2">{title}</p>
+          <p className="text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-3 tracking-tight">{value}</p>
 
           {trend && (
-            <div className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${trendColorClasses[trend.direction]}`}>
+            <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${trendColorClasses[trend.direction]}`}>
               {trend.direction === 'up' ? (
-                <TrendingUp className="w-3.5 h-3.5" />
+                <ArrowUp className="w-3 h-3" />
               ) : (
-                <TrendingDown className="w-3.5 h-3.5" />
+                <ArrowDown className="w-3 h-3" />
               )}
               <span>{trend.value}</span>
             </div>
           )}
         </div>
 
-        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg ${colorClasses[color].icon} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
-          <Icon className="w-7 h-7" />
+        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ring-4 ${colorClasses[color].icon} ${colorClasses[color].iconRing} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6`}>
+          <Icon className="w-8 h-8" strokeWidth={2.5} />
         </div>
       </div>
     </div>

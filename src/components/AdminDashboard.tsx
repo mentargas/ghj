@@ -650,7 +650,7 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
                     direction: 'up',
                     label: ''
                   }}
-                  color="blue"
+                  color="trust"
                 />
 
                 <StatCard
@@ -662,7 +662,7 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
                     direction: 'up',
                     label: ''
                   }}
-                  color="green"
+                  color="success"
                 />
 
                 <StatCard
@@ -674,7 +674,7 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
                     direction: 'down',
                     label: ''
                   }}
-                  color="orange"
+                  color="accent"
                 />
 
                 <StatCard
@@ -686,7 +686,7 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
                     direction: 'up',
                     label: ''
                   }}
-                  color="purple"
+                  color="info"
                 />
               </>
             ) : (
@@ -706,13 +706,13 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
           <div className="grid md:grid-cols-3 gap-4">
             <Card variant="elevated" hover onClick={() => setActiveTab('beneficiaries-list')} className="group">
               <div className="flex items-center space-x-3 space-x-reverse mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                <div className="w-12 h-12 bg-gradient-to-br from-trust-600 to-trust-500 rounded-xl flex items-center justify-center shadow-lg shadow-trust-600/30 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                   <UserPlus className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900">إدارة المستفيدين</h3>
+                <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">إدارة المستفيدين</h3>
               </div>
-              <p className="text-gray-600 mb-4 text-sm leading-relaxed">إضافة وإدارة المستفيدين الجدد</p>
-              <div className="flex items-center text-blue-600 text-sm font-semibold group-hover:gap-2 transition-all">
+              <p className="text-neutral-600 dark:text-neutral-400 mb-4 text-sm leading-relaxed">إضافة وإدارة المستفيدين الجدد</p>
+              <div className="flex items-center text-trust-600 dark:text-trust-400 text-sm font-semibold group-hover:gap-2 transition-all">
                 <span>إدارة المستفيدين</span>
                 <ChevronRight className="w-4 h-4 mr-1 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -720,13 +720,13 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
 
             <Card variant="elevated" hover onClick={() => setActiveTab('packages-list')} className="group">
               <div className="flex items-center space-x-3 space-x-reverse mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                <div className="w-12 h-12 bg-gradient-to-br from-success-600 to-success-500 rounded-xl flex items-center justify-center shadow-lg shadow-success-600/30 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                   <Package className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900">إدارة الطرود</h3>
+                <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">إدارة الطرود</h3>
               </div>
-              <p className="text-gray-600 mb-4 text-sm leading-relaxed">إنشاء وتوزيع الطرود</p>
-              <div className="flex items-center text-green-600 text-sm font-semibold group-hover:gap-2 transition-all">
+              <p className="text-neutral-600 dark:text-neutral-400 mb-4 text-sm leading-relaxed">إنشاء وتوزيع الطرود</p>
+              <div className="flex items-center text-success-600 dark:text-success-400 text-sm font-semibold group-hover:gap-2 transition-all">
                 <span>إدارة الطرود</span>
                 <ChevronRight className="w-4 h-4 mr-1 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -734,13 +734,13 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
 
             <Card variant="elevated" hover onClick={() => setActiveTab('reports')} className="group">
               <div className="flex items-center space-x-3 space-x-reverse mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                <div className="w-12 h-12 bg-gradient-to-br from-accent-600 to-accent-500 rounded-xl flex items-center justify-center shadow-lg shadow-accent-600/30 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                   <BarChart3 className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900">التقارير والإحصائيات</h3>
+                <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">التقارير والإحصائيات</h3>
               </div>
-              <p className="text-gray-600 mb-4 text-sm leading-relaxed">عرض التقارير المفصلة</p>
-              <div className="flex items-center text-purple-600 text-sm font-semibold group-hover:gap-2 transition-all">
+              <p className="text-neutral-600 dark:text-neutral-400 mb-4 text-sm leading-relaxed">عرض التقارير المفصلة</p>
+              <div className="flex items-center text-accent-600 dark:text-accent-400 text-sm font-semibold group-hover:gap-2 transition-all">
                 <span>عرض التقارير</span>
                 <ChevronRight className="w-4 h-4 mr-1 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -751,8 +751,8 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
           <div className="grid lg:grid-cols-2 gap-6">
             {/* Recent Activities */}
             <Card variant="elevated">
-              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Activity className="w-5 h-5 text-blue-600" />
+              <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100 mb-4 flex items-center gap-2">
+                <Activity className="w-5 h-5 text-trust-600 dark:text-trust-400" />
                 آخر الأنشطة
               </h3>
               <div className="space-y-3">
@@ -1063,18 +1063,18 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 flex" dir="rtl">
+    <div className="min-h-screen bg-gradient-mesh flex" dir="rtl">
       {/* Sidebar */}
-      <div className="w-64 bg-white/80 backdrop-blur-xl border-l border-gray-200/50 flex flex-col shadow-glass">
+      <div className="w-64 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-xl border-l border-neutral-200 dark:border-neutral-700 flex flex-col shadow-elevated">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200/50">
+        <div className="p-6 border-b border-neutral-200 dark:border-neutral-700">
           <div className="flex items-center space-x-3 space-x-reverse">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Shield className="w-5 h-5 text-white" />
+            <div className="w-12 h-12 bg-gradient-to-br from-trust-600 to-trust-500 rounded-2xl flex items-center justify-center shadow-lg shadow-trust-600/30">
+              <Shield className="w-6 h-6 text-white" strokeWidth={2.5} />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-gray-900">لوحة الإدارة</h1>
-              <p className="text-xs text-gray-500">{loggedInUser?.name}</p>
+              <h1 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">ويفره</h1>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">{loggedInUser?.name}</p>
             </div>
           </div>
         </div>
@@ -1097,12 +1097,12 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
                       setActiveTab(item.id);
                     }
                   }}
-                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
+                  className={`sidebar-item ${
                     index > 0 ? 'mt-3' : ''
                   } ${
                     isActive
-                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30 scale-[1.02]'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:scale-[1.01]'
+                      ? 'sidebar-item-active scale-[1.02]'
+                      : 'sidebar-item-inactive hover:scale-[1.01]'
                   }`}
                 >
                   <div className="flex items-center space-x-3 space-x-reverse">
@@ -1129,11 +1129,11 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
                           onClick={() => setActiveTab(child.id)}
                           className={`w-full flex items-center space-x-3 space-x-reverse px-4 py-2.5 rounded-lg text-xs transition-all duration-300 ${
                             isChildActive
-                              ? 'bg-blue-50 text-blue-700 font-semibold border-l-2 border-blue-500'
-                              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                              ? 'bg-trust-50 dark:bg-trust-900/30 text-trust-700 dark:text-trust-300 font-semibold border-l-2 border-trust-500'
+                              : 'text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100'
                           }`}
                         >
-                          <ChildIconComponent className={`w-4 h-4 ${isChildActive ? 'text-blue-600' : ''}`} />
+                          <ChildIconComponent className={`w-4 h-4 ${isChildActive ? 'text-trust-600 dark:text-trust-400' : ''}`} />
                           <span>{child.name}</span>
                         </button>
                       );
@@ -1146,21 +1146,21 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
         </nav>
 
         {/* User Info & Logout */}
-        <div className="p-4 border-t border-gray-200/50">
-          <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 border border-gray-200/50 shadow-soft">
+        <div className="p-4 border-t border-neutral-200 dark:border-neutral-700">
+          <div className="bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-800 dark:to-neutral-900 rounded-xl p-4 border border-neutral-200 dark:border-neutral-700 shadow-soft">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3 space-x-reverse">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
-                  <Shield className="w-4 h-4 text-white" />
+                <div className="w-10 h-10 bg-gradient-to-br from-trust-600 to-trust-500 rounded-xl flex items-center justify-center shadow-md">
+                  <Shield className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{loggedInUser?.name}</p>
-                  <p className="text-xs text-gray-500">مدير النظام</p>
+                  <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{loggedInUser?.name}</p>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">مدير النظام</p>
                 </div>
               </div>
               <button
                 onClick={logout}
-                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                className="p-2 text-neutral-400 dark:text-neutral-500 hover:text-error-600 hover:bg-error-50 dark:hover:bg-error-900/30 rounded-lg transition-colors"
                 title="تسجيل الخروج"
               >
                 <LogOut className="w-4 h-4" />
