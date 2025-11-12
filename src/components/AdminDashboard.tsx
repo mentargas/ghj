@@ -1065,9 +1065,9 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
   return (
     <div className="min-h-screen bg-gradient-mesh flex" dir="rtl">
       {/* Sidebar */}
-      <div className="w-64 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-xl border-l border-neutral-200 dark:border-neutral-700 flex flex-col shadow-elevated">
+      <div className="w-64 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl border-l border-neutral-200/80 dark:border-neutral-700/80 flex flex-col shadow-elevated">
         {/* Header */}
-        <div className="p-6 border-b border-neutral-200 dark:border-neutral-700">
+        <div className="p-6 border-b border-neutral-200/80 dark:border-neutral-700/80 bg-gradient-to-b from-neutral-50/50 to-transparent dark:from-neutral-800/30 dark:to-transparent">
           <div className="flex items-center space-x-3 space-x-reverse">
             <div className="w-12 h-12 bg-gradient-to-br from-trust-600 to-trust-500 rounded-2xl flex items-center justify-center shadow-lg shadow-trust-600/30">
               <Shield className="w-6 h-6 text-white" strokeWidth={2.5} />
@@ -1080,7 +1080,7 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto smooth-scroll">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto smooth-scroll">
           {navItems.map((item, index) => {
             const IconComponent = item.icon;
             const isActive = isMenuActive(item);
@@ -1098,46 +1098,61 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
                     }
                   }}
                   className={`sidebar-item ${
-                    index > 0 ? 'mt-3' : ''
+                    index > 0 ? 'mt-4' : ''
                   } ${
                     isActive
-                      ? 'sidebar-item-active scale-[1.02]'
-                      : 'sidebar-item-inactive hover:scale-[1.01]'
+                      ? 'sidebar-item-active scale-[1.02] shadow-lg shadow-trust-600/20'
+                      : 'sidebar-item-inactive hover:scale-[1.02] active:scale-[0.98]'
                   }`}
                 >
                   <div className="flex items-center space-x-3 space-x-reverse">
-                    <IconComponent className={`w-5 h-5 ml-2 ${isActive ? 'text-white' : ''}`} />
-                    <span>{item.name}</span>
+                    <IconComponent className={`w-5 h-5 ml-2 transition-transform duration-200 ${
+                      isActive ? 'text-white scale-110' : ''
+                    }`} />
+                    <span className="font-semibold text-[15px]">{item.name}</span>
                   </div>
                   {item.children && (
-                    <div className={`transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}>
+                    <div className={`transition-all duration-300 ease-out ${
+                      isExpanded ? 'rotate-90 scale-110' : 'scale-100'
+                    }`}>
                       <ChevronRight className="w-4 h-4" />
                     </div>
                   )}
                 </button>
 
                 {/* Sub Menu Items */}
-                {item.children && isExpanded && (
-                  <div className="mt-1 mr-4 space-y-1">
-                    {item.children.map((child) => {
-                      const ChildIconComponent = child.icon;
-                      const isChildActive = activeTab === child.id;
+                {item.children && (
+                  <div
+                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                      isExpanded ? 'max-h-[500px] opacity-100 mt-2 mb-3' : 'max-h-0 opacity-0'
+                    }`}
+                  >
+                    <div className="mr-6 space-y-1.5 pt-1">
+                      {item.children.map((child) => {
+                        const ChildIconComponent = child.icon;
+                        const isChildActive = activeTab === child.id;
 
-                      return (
-                        <button
-                          key={child.id}
-                          onClick={() => setActiveTab(child.id)}
-                          className={`w-full flex items-center space-x-3 space-x-reverse px-4 py-2.5 rounded-lg text-xs transition-all duration-300 ${
-                            isChildActive
-                              ? 'bg-trust-50 dark:bg-trust-900/30 text-trust-700 dark:text-trust-300 font-semibold border-l-2 border-trust-500'
-                              : 'text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100'
-                          }`}
-                        >
-                          <ChildIconComponent className={`w-4 h-4 ${isChildActive ? 'text-trust-600 dark:text-trust-400' : ''}`} />
-                          <span>{child.name}</span>
-                        </button>
-                      );
-                    })}
+                        return (
+                          <button
+                            key={child.id}
+                            onClick={() => setActiveTab(child.id)}
+                            className={`w-full flex items-center space-x-3 space-x-reverse px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group relative ${
+                              isChildActive
+                                ? 'bg-gradient-to-l from-trust-50 to-trust-100/50 dark:from-trust-900/40 dark:to-trust-800/20 text-trust-700 dark:text-trust-300 font-semibold shadow-sm border-l-3 border-trust-600 scale-[1.02]'
+                                : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 hover:text-neutral-900 dark:hover:text-neutral-100 hover:translate-x-1 hover:shadow-sm'
+                            }`}
+                          >
+                            <ChildIconComponent className={`w-4.5 h-4.5 transition-transform duration-200 ${
+                              isChildActive ? 'text-trust-600 dark:text-trust-400 scale-110' : 'group-hover:scale-105'
+                            }`} />
+                            <span className="flex-1 text-right">{child.name}</span>
+                            {isChildActive && (
+                              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-trust-600 dark:bg-trust-500 rounded-r-full"></div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
               </div>
@@ -1146,8 +1161,8 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
         </nav>
 
         {/* User Info & Logout */}
-        <div className="p-4 border-t border-neutral-200 dark:border-neutral-700">
-          <div className="bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-800 dark:to-neutral-900 rounded-xl p-4 border border-neutral-200 dark:border-neutral-700 shadow-soft">
+        <div className="p-4 border-t border-neutral-200/80 dark:border-neutral-700/80 bg-gradient-to-t from-neutral-50/30 to-transparent dark:from-neutral-800/20 dark:to-transparent">
+          <div className="bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-800 dark:to-neutral-900 rounded-xl p-4 border border-neutral-200 dark:border-neutral-700 shadow-soft hover:shadow-md transition-shadow duration-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3 space-x-reverse">
                 <div className="w-10 h-10 bg-gradient-to-br from-trust-600 to-trust-500 rounded-xl flex items-center justify-center shadow-md">

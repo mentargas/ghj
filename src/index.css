@@ -82,16 +82,16 @@
   }
 
   .smooth-scroll::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
   }
 
   .smooth-scroll::-webkit-scrollbar-track {
-    @apply bg-transparent;
+    @apply bg-neutral-100/30 dark:bg-neutral-800/30 rounded-full my-2;
   }
 
   .smooth-scroll::-webkit-scrollbar-thumb {
-    @apply bg-neutral-300 dark:bg-neutral-600 rounded-full hover:bg-neutral-400 dark:hover:bg-neutral-500;
+    @apply bg-neutral-300 dark:bg-neutral-600 rounded-full hover:bg-neutral-400 dark:hover:bg-neutral-500 transition-colors duration-200;
   }
 
   .page-header {
@@ -119,15 +119,15 @@
   }
 
   .sidebar-item {
-    @apply w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200;
+    @apply w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 ease-out;
   }
 
   .sidebar-item-active {
-    @apply bg-gradient-to-r from-trust-600 to-trust-500 text-white shadow-lg shadow-trust-500/30;
+    @apply bg-gradient-to-r from-trust-600 to-trust-500 text-white shadow-lg shadow-trust-500/30 border border-trust-700/20;
   }
 
   .sidebar-item-inactive {
-    @apply text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 hover:text-neutral-900 dark:hover:text-neutral-100;
+    @apply text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700/70 hover:text-neutral-900 dark:hover:text-neutral-100 border border-transparent hover:border-neutral-200/50 dark:hover:border-neutral-600/50;
   }
 }
 

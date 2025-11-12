@@ -108,6 +108,9 @@ export default {
         '26': '6.5rem',
         '30': '7.5rem',
       },
+      borderWidth: {
+        '3': '3px',
+      },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-glass': 'linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0))',
