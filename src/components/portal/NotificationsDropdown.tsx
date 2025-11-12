@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, CheckCircle, Package, Truck, FileText, Award, Info, X, Check, Trash2 } from 'lucide-react';
-import { notificationService } from '../../services/notificationService';
+import { notificationHubService } from '../../services/notificationHubService';
 import { Button } from '../ui';
 import type { Database } from '../../types/database';
 
@@ -23,12 +23,22 @@ export default function NotificationsDropdown({ beneficiaryId, isOpen, onClose }
     }
   }, [isOpen, beneficiaryId]);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (isOpen) {
+        loadUnreadCount();
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [isOpen, beneficiaryId]);
+
   const loadNotifications = async () => {
     try {
       setIsLoading(true);
       const [allNotifications, count] = await Promise.all([
-        notificationService.getAllNotifications(beneficiaryId, 20),
-        notificationService.getUnreadCount(beneficiaryId)
+        notificationHubService.getNotifications(beneficiaryId, 20),
+        notificationHubService.getUnreadCount(beneficiaryId)
       ]);
       setNotifications(allNotifications);
       setUnreadCount(count);
@@ -39,9 +49,18 @@ export default function NotificationsDropdown({ beneficiaryId, isOpen, onClose }
     }
   };
 
+  const loadUnreadCount = async () => {
+    try {
+      const count = await notificationHubService.getUnreadCount(beneficiaryId);
+      setUnreadCount(count);
+    } catch (error) {
+      console.error('Error loading unread count:', error);
+    }
+  };
+
   const handleMarkAsRead = async (notificationId: string) => {
     try {
-      await notificationService.markAsRead(notificationId);
+      await notificationHubService.markAsRead(notificationId);
       setNotifications(prev =>
         prev.map(n => n.id === notificationId ? { ...n, is_read: true } : n)
       );
@@ -53,7 +72,7 @@ export default function NotificationsDropdown({ beneficiaryId, isOpen, onClose }
 
   const handleMarkAllAsRead = async () => {
     try {
-      await notificationService.markAllAsRead(beneficiaryId);
+      await notificationHubService.markAllAsRead(beneficiaryId);
       setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
       setUnreadCount(0);
     } catch (error) {
@@ -63,8 +82,11 @@ export default function NotificationsDropdown({ beneficiaryId, isOpen, onClose }
 
   const handleDelete = async (notificationId: string) => {
     try {
-      await notificationService.deleteNotification(notificationId);
+      await notificationHubService.deleteNotification(notificationId);
       setNotifications(prev => prev.filter(n => n.id !== notificationId));
+      if (!notifications.find(n => n.id === notificationId)?.is_read) {
+        setUnreadCount(prev => Math.max(0, prev - 1));
+      }
     } catch (error) {
       console.error('Error deleting notification:', error);
     }
@@ -177,7 +199,7 @@ export default function NotificationsDropdown({ beneficiaryId, isOpen, onClose }
 
                         <div className="flex items-center justify-between">
                           <span className="text-xs text-gray-500">
-                            {notificationService.formatNotificationTime(notification.created_at)}
+                            {formatNotificationTime(notification.created_at)}
                           </span>
 
                           <div className="flex items-center gap-2">
@@ -210,12 +232,16 @@ export default function NotificationsDropdown({ beneficiaryId, isOpen, onClose }
           <div className="p-3 border-t border-gray-200 bg-gray-50">
             <button
               onClick={async () => {
-                try {
-                  await notificationService.deleteAllNotifications(beneficiaryId);
-                  setNotifications([]);
-                  setUnreadCount(0);
-                } catch (error) {
-                  console.error('Error deleting all notifications:', error);
+                if (window.confirm('هل أنت متأكد من حذف جميع الإشعارات؟')) {
+                  try {
+                    for (const notification of notifications) {
+                      await notificationHubService.deleteNotification(notification.id);
+                    }
+                    setNotifications([]);
+                    setUnreadCount(0);
+                  } catch (error) {
+                    console.error('Error deleting all notifications:', error);
+                  }
                 }
               }}
               className="w-full text-sm text-red-600 hover:text-red-700 font-medium py-2"
@@ -228,4 +254,24 @@ export default function NotificationsDropdown({ beneficiaryId, isOpen, onClose }
       </div>
     </>
   );
+}
+
+function formatNotificationTime(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return 'الآن';
+  if (diffMins < 60) return `منذ ${diffMins} دقيقة`;
+  if (diffHours < 24) return `منذ ${diffHours} ساعة`;
+  if (diffDays < 7) return `منذ ${diffDays} يوم`;
+
+  return date.toLocaleDateString('ar-SA', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
 }

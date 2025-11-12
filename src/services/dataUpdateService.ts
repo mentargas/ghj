@@ -124,14 +124,15 @@ export const dataUpdateService = {
 
     if (applyError) throw applyError;
 
-    const fieldsList = Object.keys(update.changes).map(f => this.getFieldArabicName(f)).join('، ');
-
-    await this.createNotification(
-      update.beneficiary_id,
-      'data_update_response',
-      'تمت الموافقة على تحديث البيانات',
-      `تمت الموافقة على طلب تحديث البيانات التالية: ${fieldsList}.`
-    );
+    try {
+      const { notificationHubService } = await import('./notificationHubService');
+      await notificationHubService.sendDataUpdateResponseNotification(
+        update.beneficiary_id,
+        true
+      );
+    } catch (notifError) {
+      console.error('Failed to send data update approval notification:', notifError);
+    }
   },
 
   async rejectDataUpdate(updateId: string, reviewedBy: string, reason: string, notes?: string): Promise<void> {
@@ -159,14 +160,16 @@ export const dataUpdateService = {
 
     if (error) throw error;
 
-    const fieldsList = Object.keys(update.changes).map(f => this.getFieldArabicName(f)).join('، ');
-
-    await this.createNotification(
-      update.beneficiary_id,
-      'data_update_response',
-      'تم رفض تحديث البيانات',
-      `تم رفض طلب تحديث البيانات التالية: ${fieldsList}. السبب: ${reason}`
-    );
+    try {
+      const { notificationHubService } = await import('./notificationHubService');
+      await notificationHubService.sendDataUpdateResponseNotification(
+        update.beneficiary_id,
+        false,
+        reason
+      );
+    } catch (notifError) {
+      console.error('Failed to send data update rejection notification:', notifError);
+    }
   },
 
   async canUpdateField(beneficiaryId: string, fieldName: string): Promise<{

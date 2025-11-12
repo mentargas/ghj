@@ -223,7 +223,7 @@ export const packagesService = {
     return data || [];
   },
 
-  async create(packageData: any): Promise<PackageType> {
+  async create(packageData: any, sendNotification: boolean = true): Promise<PackageType> {
     if (!supabase) throw new Error('Supabase not initialized');
 
     const { data, error } = await supabase
@@ -233,6 +233,65 @@ export const packagesService = {
       .single();
 
     if (error) throw error;
+
+    if (sendNotification && packageData.beneficiary_id) {
+      try {
+        const { notificationHubService } = await import('./notificationHubService');
+        const beneficiary = await beneficiariesService.getById(packageData.beneficiary_id);
+
+        if (beneficiary) {
+          await notificationHubService.sendPackageAssignedNotification(
+            beneficiary.id,
+            beneficiary.name,
+            packageData.name || 'طرد جديد',
+            data.id,
+            beneficiary.phone
+          );
+        }
+      } catch (notifError) {
+        console.error('Failed to send notification for new package:', notifError);
+      }
+    }
+
+    return data;
+  },
+
+  async updateStatus(
+    packageId: string,
+    status: PackageType['status'],
+    sendNotification: boolean = true
+  ): Promise<PackageType> {
+    if (!supabase) throw new Error('Supabase not initialized');
+
+    const { data, error } = await supabase
+      .from('packages')
+      .update({ status })
+      .eq('id', packageId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    if (sendNotification && data.beneficiary_id && ['in_delivery', 'delivered', 'failed'].includes(status)) {
+      try {
+        const { notificationHubService } = await import('./notificationHubService');
+        const beneficiary = await beneficiariesService.getById(data.beneficiary_id);
+
+        if (beneficiary) {
+          await notificationHubService.sendPackageDeliveryNotification(
+            beneficiary.id,
+            beneficiary.name,
+            data.name,
+            data.id,
+            status,
+            beneficiary.phone
+          );
+        }
+      } catch (notifError) {
+        console.error('Failed to send notification for package status update:', notifError);
+      }
+    }
+
     return data;
   }
 };
