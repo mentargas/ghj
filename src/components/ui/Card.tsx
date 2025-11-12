@@ -6,6 +6,7 @@ interface CardProps {
   padding?: 'none' | 'sm' | 'md' | 'lg';
   hover?: boolean;
   onClick?: () => void;
+  variant?: 'default' | 'glass' | 'elevated';
 }
 
 export default function Card({
@@ -13,10 +14,9 @@ export default function Card({
   className = '',
   padding = 'md',
   hover = false,
-  onClick
+  onClick,
+  variant = 'default'
 }: CardProps) {
-  const baseClasses = 'bg-white border border-gray-200 rounded-xl transition-colors';
-  
   const paddingClasses = {
     none: '',
     sm: 'p-4',
@@ -24,10 +24,16 @@ export default function Card({
     lg: 'p-8'
   };
 
-  const hoverClasses = hover ? 'hover:border-gray-300 cursor-pointer' : '';
+  const variantClasses = {
+    default: 'bg-white border border-gray-200 shadow-soft',
+    glass: 'glass-card',
+    elevated: 'bg-white border border-gray-100 shadow-elevated'
+  };
+
+  const hoverClasses = hover ? 'card-hover cursor-pointer' : '';
   const clickableClasses = onClick ? 'cursor-pointer' : '';
 
-  const classes = `${baseClasses} ${paddingClasses[padding]} ${hoverClasses} ${clickableClasses} ${className}`;
+  const classes = `${variantClasses[variant]} ${paddingClasses[padding]} ${hoverClasses} ${clickableClasses} rounded-xl transition-all duration-300 ${className}`;
 
   return (
     <div className={classes} onClick={onClick}>

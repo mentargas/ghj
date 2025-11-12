@@ -13,15 +13,15 @@ export function LoadingSkeleton({
   lines = 1,
   animated = true
 }: LoadingSkeletonProps) {
-  const baseClasses = `bg-gray-200 ${animated ? 'animate-pulse' : ''}`;
+  const baseClasses = `skeleton ${animated ? '' : ''}`;
 
   const variants = {
-    card: 'rounded-xl h-32',
+    card: 'rounded-2xl h-32',
     text: 'rounded h-4',
     circle: 'rounded-full w-12 h-12',
     avatar: 'rounded-full w-16 h-16',
-    button: 'rounded-lg h-10 w-24',
-    input: 'rounded-lg h-12'
+    button: 'rounded-xl h-10 w-24',
+    input: 'rounded-xl h-12'
   };
 
   if (variant === 'text' && lines > 1) {

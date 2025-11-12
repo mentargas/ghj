@@ -597,14 +597,16 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
 
           {/* Critical Alerts */}
           {criticalAlerts.length > 0 && (
-            <Card className="bg-red-50 border-red-200">
+            <Card variant="elevated" className="bg-gradient-to-r from-red-50 to-orange-50 border-red-200 animate-slide-down">
               <div className="flex items-center space-x-3 space-x-reverse mb-4">
-                <AlertTriangle className="w-5 h-5 text-red-600" />
-                <h3 className="text-lg font-semibold text-red-800">تنبيهات حرجة تحتاج إجراء فوري</h3>
+                <div className="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center shadow-lg animate-pulse-soft">
+                  <AlertTriangle className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="text-lg font-bold text-red-800">تنبيهات حرجة تحتاج إجراء فوري</h3>
               </div>
               <div className="space-y-3">
-                {criticalAlerts.slice(0, 3).map((alert) => (
-                  <Card key={alert.id} className="bg-white border-red-200" padding="sm">
+                {criticalAlerts.slice(0, 3).map((alert, index) => (
+                  <Card key={alert.id} variant="elevated" className="bg-white border-red-100 hover:border-red-200 animate-fade-in" padding="sm" style={{ animationDelay: `${index * 100}ms` }}>
                     <div>
                       <p className="font-medium text-gray-900">{alert.title}</p>
                       <p className="text-sm text-gray-600">{alert.description}</p>
@@ -702,45 +704,45 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
           {/* Alerts Loading/Error States */}
           {/* Quick Actions */}
           <div className="grid md:grid-cols-3 gap-4">
-            <Card hover onClick={() => setActiveTab('beneficiaries-list')}>
+            <Card variant="elevated" hover onClick={() => setActiveTab('beneficiaries-list')} className="group">
               <div className="flex items-center space-x-3 space-x-reverse mb-4">
-                <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                  <UserPlus className="w-4 h-4 text-blue-600" />
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                  <UserPlus className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">إدارة المستفيدين</h3>
+                <h3 className="text-lg font-bold text-gray-900">إدارة المستفيدين</h3>
               </div>
-              <p className="text-gray-600 mb-4 text-sm">إضافة وإدارة المستفيدين الجدد</p>
-              <div className="flex items-center text-blue-600 text-sm font-medium">
+              <p className="text-gray-600 mb-4 text-sm leading-relaxed">إضافة وإدارة المستفيدين الجدد</p>
+              <div className="flex items-center text-blue-600 text-sm font-semibold group-hover:gap-2 transition-all">
                 <span>إدارة المستفيدين</span>
-                <ChevronRight className="w-4 h-4 mr-1" />
+                <ChevronRight className="w-4 h-4 mr-1 group-hover:translate-x-1 transition-transform" />
               </div>
             </Card>
 
-            <Card hover onClick={() => setActiveTab('packages-list')}>
+            <Card variant="elevated" hover onClick={() => setActiveTab('packages-list')} className="group">
               <div className="flex items-center space-x-3 space-x-reverse mb-4">
-                <div className="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
-                  <Package className="w-4 h-4 text-green-600" />
+                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                  <Package className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">إدارة الطرود</h3>
+                <h3 className="text-lg font-bold text-gray-900">إدارة الطرود</h3>
               </div>
-              <p className="text-gray-600 mb-4 text-sm">إنشاء وتوزيع الطرود</p>
-              <div className="flex items-center text-green-600 text-sm font-medium">
+              <p className="text-gray-600 mb-4 text-sm leading-relaxed">إنشاء وتوزيع الطرود</p>
+              <div className="flex items-center text-green-600 text-sm font-semibold group-hover:gap-2 transition-all">
                 <span>إدارة الطرود</span>
-                <ChevronRight className="w-4 h-4 mr-1" />
+                <ChevronRight className="w-4 h-4 mr-1 group-hover:translate-x-1 transition-transform" />
               </div>
             </Card>
 
-            <Card hover onClick={() => setActiveTab('reports')}>
+            <Card variant="elevated" hover onClick={() => setActiveTab('reports')} className="group">
               <div className="flex items-center space-x-3 space-x-reverse mb-4">
-                <div className="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="w-4 h-4 text-purple-600" />
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                  <BarChart3 className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">التقارير والإحصائيات</h3>
+                <h3 className="text-lg font-bold text-gray-900">التقارير والإحصائيات</h3>
               </div>
-              <p className="text-gray-600 mb-4 text-sm">عرض التقارير المفصلة</p>
-              <div className="flex items-center text-purple-600 text-sm font-medium">
+              <p className="text-gray-600 mb-4 text-sm leading-relaxed">عرض التقارير المفصلة</p>
+              <div className="flex items-center text-purple-600 text-sm font-semibold group-hover:gap-2 transition-all">
                 <span>عرض التقارير</span>
-                <ChevronRight className="w-4 h-4 mr-1" />
+                <ChevronRight className="w-4 h-4 mr-1 group-hover:translate-x-1 transition-transform" />
               </div>
             </Card>
           </div>
@@ -748,12 +750,15 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
           {/* Recent Activities and System Map */}
           <div className="grid lg:grid-cols-2 gap-6">
             {/* Recent Activities */}
-            <Card>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">آخر الأنشطة</h3>
-              <div className="space-y-4">
-                <div className="flex items-start space-x-3 space-x-reverse p-3 rounded-lg bg-green-50 border border-green-200">
-                  <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+            <Card variant="elevated">
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <Activity className="w-5 h-5 text-blue-600" />
+                آخر الأنشطة
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-start space-x-3 space-x-reverse p-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/50 hover:shadow-md transition-all duration-300 group">
+                  <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                    <CheckCircle className="w-4 h-4 text-white" />
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900">تم تسليم 15 طرد في منطقة خان يونس</p>
@@ -761,9 +766,9 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
                   </div>
                 </div>
                 
-                <div className="flex items-start space-x-3 space-x-reverse p-3 rounded-lg bg-blue-50 border border-blue-200">
-                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
-                    <UserPlus className="w-4 h-4 text-blue-600" />
+                <div className="flex items-start space-x-3 space-x-reverse p-4 rounded-xl bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200/50 hover:shadow-md transition-all duration-300 group">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                    <UserPlus className="w-4 h-4 text-white" />
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900">إضافة 8 مستفيدين جدد للنظام</p>
@@ -771,9 +776,9 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
                   </div>
                 </div>
                 
-                <div className="flex items-start space-x-3 space-x-reverse p-3 rounded-lg bg-orange-50 border border-orange-200">
-                  <div className="w-6 h-6 bg-orange-100 rounded-full flex items-center justify-center">
-                    <AlertTriangle className="w-4 h-4 text-orange-600" />
+                <div className="flex items-start space-x-3 space-x-reverse p-4 rounded-xl bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200/50 hover:shadow-md transition-all duration-300 group">
+                  <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                    <AlertTriangle className="w-4 h-4 text-white" />
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900">تحديث عناوين 3 مستفيدين</p>
@@ -781,9 +786,9 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
                   </div>
                 </div>
                 
-                <div className="flex items-start space-x-3 space-x-reverse p-3 rounded-lg bg-purple-50 border border-purple-200">
-                  <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">
-                    <Building2 className="w-4 h-4 text-purple-600" />
+                <div className="flex items-start space-x-3 space-x-reverse p-4 rounded-xl bg-gradient-to-r from-purple-50 to-violet-50 border border-purple-200/50 hover:shadow-md transition-all duration-300 group">
+                  <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                    <Building2 className="w-4 h-4 text-white" />
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900">تسجيل مؤسسة جديدة: جمعية الخير</p>
@@ -803,9 +808,12 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
             </Card>
 
             {/* System Overview Map */}
-            <Card>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">خريطة النظام</h3>
-              <div className="bg-gray-50 rounded-lg h-64 flex items-center justify-center relative">
+            <Card variant="elevated">
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-blue-600" />
+                خريطة النظام
+              </h3>
+              <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-xl h-64 flex items-center justify-center relative border border-gray-200/50">
                 <div className="text-center z-10">
                   <MapPin className="w-8 h-8 text-gray-400 mx-auto mb-3" />
                   <p className="text-sm font-medium text-gray-700">قطاع غزة - نظرة شاملة</p>
@@ -1055,24 +1063,24 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/30 flex" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 flex" dir="rtl">
       {/* Sidebar */}
-      <div className="w-64 bg-white border-l border-gray-200 flex flex-col">
+      <div className="w-64 bg-white/80 backdrop-blur-xl border-l border-gray-200/50 flex flex-col shadow-glass">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-gray-200/50">
           <div className="flex items-center space-x-3 space-x-reverse">
-            <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-              <Shield className="w-4 h-4 text-blue-600" />
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+              <Shield className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-gray-900">لوحة الإدارة</h1>
-              <p className="text-sm text-gray-500">{loggedInUser?.name}</p>
+              <h1 className="text-lg font-bold text-gray-900">لوحة الإدارة</h1>
+              <p className="text-xs text-gray-500">{loggedInUser?.name}</p>
             </div>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto smooth-scroll">
           {navItems.map((item, index) => {
             const IconComponent = item.icon;
             const isActive = isMenuActive(item);
@@ -1089,16 +1097,16 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
                       setActiveTab(item.id);
                     }
                   }}
-                  className={`w-full flex items-center justify-between px-4 py-4 rounded-lg text-base font-semibold transition-all duration-200 ${
-                    index > 0 ? 'mt-4' : ''
+                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
+                    index > 0 ? 'mt-3' : ''
                   } ${
                     isActive
-                      ? 'bg-blue-50 text-blue-700 border-l-2 border-blue-600'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30 scale-[1.02]'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:scale-[1.01]'
                   }`}
                 >
                   <div className="flex items-center space-x-3 space-x-reverse">
-                    <IconComponent className={`w-4 h-4 ml-2 ${isActive ? 'text-blue-600' : ''}`} />
+                    <IconComponent className={`w-5 h-5 ml-2 ${isActive ? 'text-white' : ''}`} />
                     <span>{item.name}</span>
                   </div>
                   {item.children && (
@@ -1119,9 +1127,9 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
                         <button
                           key={child.id}
                           onClick={() => setActiveTab(child.id)}
-                          className={`w-full flex items-center space-x-3 space-x-reverse px-4 py-2 rounded-lg text-sm transition-all duration-200 ${
+                          className={`w-full flex items-center space-x-3 space-x-reverse px-4 py-2.5 rounded-lg text-xs transition-all duration-300 ${
                             isChildActive
-                              ? 'bg-blue-50 text-blue-700 font-medium border-l-2 border-blue-500'
+                              ? 'bg-blue-50 text-blue-700 font-semibold border-l-2 border-blue-500'
                               : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                           }`}
                         >
@@ -1138,12 +1146,12 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
         </nav>
 
         {/* User Info & Logout */}
-        <div className="p-4 border-t border-gray-200">
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+        <div className="p-4 border-t border-gray-200/50">
+          <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 border border-gray-200/50 shadow-soft">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3 space-x-reverse">
-                <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Shield className="w-4 h-4 text-blue-600" />
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                  <Shield className="w-4 h-4 text-white" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-900">{loggedInUser?.name}</p>
@@ -1164,7 +1172,7 @@ export default function AdminDashboard({ activeTab, setActiveTab }: AdminDashboa
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 smooth-scroll overflow-y-auto">
           <ErrorBoundary>
             {renderMainContent()}
           </ErrorBoundary>

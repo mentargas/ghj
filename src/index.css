@@ -1,32 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* RTL Support */
-html {
-  direction: rtl;
+@layer base {
+  html {
+    direction: rtl;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Almarai', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    @apply bg-gray-50/50 text-gray-900;
+  }
+
+  * {
+    @apply transition-colors duration-200;
+  }
 }
 
-body {
-  font-family: 'Almarai', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+@layer components {
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-glass;
+  }
+
+  .glass-card-lg {
+    @apply bg-white/90 backdrop-blur-xl border border-white/30 shadow-glass-lg;
+  }
+
+  .gradient-primary {
+    @apply bg-gradient-to-br from-primary-500 to-primary-700;
+  }
+
+  .gradient-success {
+    @apply bg-gradient-to-br from-success-500 to-success-700;
+  }
+
+  .gradient-warning {
+    @apply bg-gradient-to-br from-warning-500 to-warning-700;
+  }
+
+  .gradient-danger {
+    @apply bg-gradient-to-br from-danger-500 to-danger-700;
+  }
+
+  .skeleton {
+    @apply relative overflow-hidden bg-gray-200 rounded;
+  }
+
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent;
+    animation: shimmer 2s infinite;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-elevated hover:-translate-y-1;
+  }
+
+  .smooth-scroll {
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(203 213 225) transparent;
+  }
+
+  .smooth-scroll::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .smooth-scroll::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .smooth-scroll::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full hover:bg-gray-400;
+  }
 }
 
-/* Custom RTL utilities */
-.rtl-flip {
-  transform: scaleX(-1);
-}
+@layer utilities {
+  .rtl-flip {
+    transform: scaleX(-1);
+  }
 
-/* Fix for icons in RTL */
-.icon-rtl {
-  margin-left: 0;
-  margin-right: 0.5rem;
-}
+  .icon-rtl {
+    margin-left: 0;
+    margin-right: 0.5rem;
+  }
 
-/* Scrollbar RTL fix */
-.scrollbar-rtl {
-  direction: ltr;
-}
+  .scrollbar-rtl {
+    direction: ltr;
+  }
 
-.scrollbar-rtl > * {
-  direction: rtl;
+  .scrollbar-rtl > * {
+    direction: rtl;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .backdrop-blur-glass {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
 }
