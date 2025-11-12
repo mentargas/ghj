@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserCheck, CheckCircle, Clock, AlertTriangle, Users, Shield, Camera, FileText, Upload, RefreshCw, Search, Filter, ChevronLeft, ChevronRight, ArrowUp, ArrowDown, Minus } from 'lucide-react';
+import { UserCheck, CheckCircle, Clock, AlertTriangle, Users, Shield, Camera, FileText, Upload, RefreshCw, Search, Filter, ChevronLeft, ChevronRight, ArrowUp, ArrowDown, Minus, Star } from 'lucide-react';
 import { mockBeneficiaries, type Beneficiary } from '../../data/mockData';
 import BeneficiaryProfileModal from '../BeneficiaryProfileModal';
 import { Button, Card, Input, Badge, ConfirmationModal } from '../ui';
@@ -191,6 +191,15 @@ export default function StatusManagementPage({ onNavigateToIndividualSend }: Sta
   };
   
   const handleRequestReupload = (beneficiaryId: string, beneficiaryName: string) => {
+    setConfirmAction({
+      type: 'reupload',
+      beneficiaryId,
+      beneficiaryName
+    });
+    setShowConfirmModal(true);
+  };
+
+  const handleRejectIdentity = (beneficiaryId: string, beneficiaryName: string) => {
     setConfirmAction({
       type: 'reupload',
       beneficiaryId,

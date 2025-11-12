@@ -188,7 +188,7 @@ export default function OrganizationsDashboard({ onNavigateBack }: Organizations
                     direction: 'up',
                     label: ''
                   }}
-                  color="blue"
+                  color="primary"
                 />
 
                 <StatCard
@@ -200,7 +200,7 @@ export default function OrganizationsDashboard({ onNavigateBack }: Organizations
                     direction: 'up',
                     label: ''
                   }}
-                  color="green"
+                  color="success"
                 />
 
                 <StatCard
@@ -212,7 +212,7 @@ export default function OrganizationsDashboard({ onNavigateBack }: Organizations
                     direction: 'up',
                     label: ''
                   }}
-                  color="purple"
+                  color="secondary"
                 />
 
                 <StatCard
@@ -224,7 +224,7 @@ export default function OrganizationsDashboard({ onNavigateBack }: Organizations
                     direction: 'down',
                     label: ''
                   }}
-                  color="orange"
+                  color="warning"
                 />
               </div>
 

@@ -120,28 +120,28 @@ export default function BeneficiariesListPage({ onNavigateToIndividualSend }: Be
           title="إجمالي المستفيدين"
           value={statistics.total}
           icon={Users}
-          color="blue"
+          color="primary"
         />
 
         <StatCard
           title="موثقين"
           value={statistics.verified}
           icon={Shield}
-          color="green"
+          color="success"
         />
 
         <StatCard
           title="بانتظار التوثيق"
           value={statistics.pending}
           icon={Clock}
-          color="orange"
+          color="warning"
         />
 
         <StatCard
           title="مرفوض التوثيق"
           value={statistics.rejected}
           icon={Shield}
-          color="red"
+          color="error"
         />
       </div>
 
