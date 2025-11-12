@@ -10,7 +10,7 @@ interface StatCardProps {
     direction: 'up' | 'down';
     label: string;
   };
-  color?: 'primary' | 'secondary' | 'accent' | 'success' | 'warning' | 'error' | 'info';
+  color?: 'primary' | 'secondary' | 'accent' | 'success' | 'warning' | 'error' | 'info' | 'trust';
   className?: string;
   loading?: boolean;
 }
@@ -73,6 +73,13 @@ const StatCard = React.memo(function StatCard({
       border: 'border-secondary-100 dark:border-secondary-900/50',
       glow: 'group-hover:shadow-secondary-500/40',
       accent: 'text-secondary-600 dark:text-secondary-400'
+    },
+    trust: {
+      icon: 'bg-gradient-to-br from-trust-600 to-trust-800 text-white shadow-lg shadow-trust-600/30',
+      iconRing: 'ring-trust-100 dark:ring-trust-900/50',
+      border: 'border-trust-100 dark:border-trust-900/50',
+      glow: 'group-hover:shadow-trust-600/40',
+      accent: 'text-trust-600 dark:text-trust-400'
     }
   };
 
