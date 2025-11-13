@@ -1,8 +1,6 @@
 import { supabase } from '../lib/supabaseClient';
 import type { Database } from '../types/database';
 import { withRetry, handleApiError } from '../utils/apiHelpers';
-import { transformBeneficiary, transformBeneficiaries, transformBeneficiaryToDB } from '../utils/dataTransformers';
-import type { Beneficiary as BeneficiaryFrontend } from '../data/mockData';
 
 type Beneficiary = Database['public']['Tables']['beneficiaries']['Row'];
 type BeneficiaryInsert = Database['public']['Tables']['beneficiaries']['Insert'];
@@ -19,7 +17,7 @@ type SystemUser = Database['public']['Tables']['system_users']['Row'];
 type Permission = Database['public']['Tables']['permissions']['Row'];
 
 export const beneficiariesService = {
-  async getAll(): Promise<BeneficiaryFrontend[]> {
+  async getAll(): Promise<Beneficiary[]> {
     if (!supabase) throw new Error('Supabase not initialized');
 
     return withRetry(async () => {
@@ -32,7 +30,7 @@ export const beneficiariesService = {
         const apiError = handleApiError(error);
         throw new Error(apiError.message);
       }
-      return transformBeneficiaries(data || []);
+      return data || [];
     });
   },
 
@@ -58,7 +56,7 @@ export const beneficiariesService = {
     return data || [];
   },
 
-  async getById(id: string): Promise<BeneficiaryFrontend | null> {
+  async getById(id: string): Promise<Beneficiary | null> {
     if (!supabase) throw new Error('Supabase not initialized');
 
     const { data, error } = await supabase
@@ -68,10 +66,10 @@ export const beneficiariesService = {
       .maybeSingle();
 
     if (error) throw error;
-    return data ? transformBeneficiary(data) : null;
+    return data;
   },
 
-  async getByOrganization(organizationId: string): Promise<BeneficiaryFrontend[]> {
+  async getByOrganization(organizationId: string): Promise<Beneficiary[]> {
     if (!supabase) throw new Error('Supabase not initialized');
 
     const { data, error } = await supabase
@@ -80,10 +78,10 @@ export const beneficiariesService = {
       .eq('organization_id', organizationId);
 
     if (error) throw error;
-    return transformBeneficiaries(data || []);
+    return data || [];
   },
 
-  async getByFamily(familyId: string): Promise<BeneficiaryFrontend[]> {
+  async getByFamily(familyId: string): Promise<Beneficiary[]> {
     if (!supabase) throw new Error('Supabase not initialized');
 
     const { data, error } = await supabase
@@ -92,36 +90,34 @@ export const beneficiariesService = {
       .eq('family_id', familyId);
 
     if (error) throw error;
-    return transformBeneficiaries(data || []);
+    return data || [];
   },
 
-  async create(beneficiary: Partial<BeneficiaryFrontend>): Promise<BeneficiaryFrontend> {
+  async create(beneficiary: BeneficiaryInsert): Promise<Beneficiary> {
     if (!supabase) throw new Error('Supabase not initialized');
 
-    const dbBeneficiary = transformBeneficiaryToDB(beneficiary);
     const { data, error } = await supabase
       .from('beneficiaries')
-      .insert(dbBeneficiary)
+      .insert(beneficiary)
       .select()
       .single();
 
     if (error) throw error;
-    return transformBeneficiary(data);
+    return data;
   },
 
-  async update(id: string, updates: Partial<BeneficiaryFrontend>): Promise<BeneficiaryFrontend> {
+  async update(id: string, updates: Partial<Beneficiary>): Promise<Beneficiary> {
     if (!supabase) throw new Error('Supabase not initialized');
 
-    const dbUpdates = transformBeneficiaryToDB(updates);
     const { data, error } = await supabase
       .from('beneficiaries')
-      .update({ ...dbUpdates, updated_at: new Date().toISOString() })
+      .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
       .single();
 
     if (error) throw error;
-    return transformBeneficiary(data);
+    return data;
   },
 
   async delete(id: string): Promise<void> {
